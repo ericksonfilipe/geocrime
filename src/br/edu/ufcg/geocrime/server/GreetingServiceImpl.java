@@ -46,4 +46,10 @@ public class GreetingServiceImpl extends RemoteServiceServlet implements
 		return html.replaceAll("&", "&amp;").replaceAll("<", "&lt;")
 				.replaceAll(">", "&gt;");
 	}
+
+	@Override
+	public String getAreas() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

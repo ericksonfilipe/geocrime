@@ -27,6 +27,6 @@ public class GeoCrime implements EntryPoint {
 	 * This is the entry point method.
 	 */
 	public void onModuleLoad() {
-		RootPanel.get().add(new Button("PUFFFFFFFFFFFFFFF"));
+		RootPanel.get().add(new PainelPrincipal());
 	}
 }
