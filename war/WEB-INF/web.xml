@@ -6,10 +6,19 @@
 <web-app>
   
   <!-- Servlets -->
+  <servlet>
+    <servlet-name>GeoCrimeServiceImpl</servlet-name>
+    <servlet-class>com.ufcg.sig.geocrime.server.GeoCrimeServiceImpl</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+    <servlet-name>GeoCrimeServiceImpl</servlet-name>
+    <url-pattern>/geocrime/geoCrimeService</url-pattern>
+  </servlet-mapping>
   
   <!-- Default page to serve -->
   <welcome-file-list>
-    <welcome-file>Geocrime.html</welcome-file>
+    <welcome-file>GeoCrime.html</welcome-file>
   </welcome-file-list>
 
 </web-app>
