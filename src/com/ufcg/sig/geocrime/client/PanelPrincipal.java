@@ -9,9 +9,9 @@ import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
-public class PanelPrincipal extends Composite{
+public class PanelPrincipal extends Composite {
 
-private MapWidget mapWidget;
+	private MapWidget mapWidget;
 	
 	public PanelPrincipal() {
 		// coisas do mapa
@@ -44,5 +44,6 @@ private MapWidget mapWidget;
 		
 		initWidget(panelCompleto);
 	}
+	
 	
 }

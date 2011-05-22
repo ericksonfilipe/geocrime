@@ -4,9 +4,10 @@ import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.user.client.ui.RootPanel;
 
 /**
- * Entry point classes define <code>onModuleLoad()</code>.
+ * Tela Inicial
  */
-public class Geocrime implements EntryPoint {
+public class GeoCrime implements EntryPoint {
+	
 	public void onModuleLoad() {
 		RootPanel.get().add(new PanelPrincipal());
 	}
