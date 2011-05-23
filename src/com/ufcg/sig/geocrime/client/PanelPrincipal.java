@@ -1,7 +1,7 @@
 package com.ufcg.sig.geocrime.client;
 
-import java.util.Iterator;
-
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.maps.client.MapUIOptions;
 import com.google.gwt.maps.client.MapWidget;
 import com.google.gwt.maps.client.geom.LatLng;
@@ -12,13 +12,13 @@ import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.VerticalPanel;
-import com.google.gwt.user.client.ui.Widget;
 
 public class PanelPrincipal extends Composite {
 
 	private MapWidget mapWidget;
+	private DecoratorPanel dPanel;
+	private VerticalPanel panelPrincipal;
 	
 	public PanelPrincipal() {
 		// coisas do mapa
@@ -34,7 +34,7 @@ public class PanelPrincipal extends Composite {
 		mapWidget.setDraggable(true);
 		
 		
-		VerticalPanel panelPrincipal = new VerticalPanel();
+		panelPrincipal = new VerticalPanel();
 		panelPrincipal.setSpacing(10);
 		panelPrincipal.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_CENTER);
 		
@@ -44,7 +44,10 @@ public class PanelPrincipal extends Composite {
 		DecoratorPanel panelMapa = new DecoratorPanel();
 		panelMapa.add(mapWidget);		
 		
-		panelOpcoesEMapa.add(criaPanelOpcao());
+		
+		dPanel = criaPanelOpcao();
+		
+		panelOpcoesEMapa.add(dPanel);
 		panelOpcoesEMapa.add(panelMapa);
 		
 		panelPrincipal.add(criaDecoratorBanner());
@@ -64,21 +67,35 @@ public class PanelPrincipal extends Composite {
 	
 	
 	private DecoratorPanel criaPanelOpcao() {
-		DecoratorPanel dPanel = new DecoratorPanel();
+		DecoratorPanel panelOpcao = new DecoratorPanel();
 		
 		VerticalPanel vPanel = new VerticalPanel();
 		vPanel.setSpacing(10);
 		
 		vPanel.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_CENTER);
-		vPanel.add(new Button("Botao 1"));
+		Button bCadastrar = new Button("Cadastrar Crime");
+		
+		bCadastrar.addClickHandler(new ClickHandler() {
+			
+			@Override
+			public void onClick(ClickEvent event) {
+				PopupCadastrar popupCadastrar = new PopupCadastrar();
+				popupCadastrar.center();
+				popupCadastrar.show();
+			}
+			
+		});
+		
+		
+		vPanel.add(bCadastrar);
 		vPanel.add(new Button("Botao 2"));
 		vPanel.add(new Button("Botao 3"));
 		vPanel.add(new Button("Botao 4"));
 		vPanel.add(new Button("Botao 5"));		
 		
-		dPanel.add(vPanel);
-		
-		return dPanel;
+		panelOpcao.add(vPanel);
+
+		return panelOpcao;
 	}
 	
 	private VerticalPanel criaDecoratorBanner() {
