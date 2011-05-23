@@ -1,13 +1,20 @@
 package com.ufcg.sig.geocrime.client;
 
+import java.util.Iterator;
+
 import com.google.gwt.maps.client.MapUIOptions;
 import com.google.gwt.maps.client.MapWidget;
 import com.google.gwt.maps.client.geom.LatLng;
+import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DecoratorPanel;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.Image;
+import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.VerticalPanel;
+import com.google.gwt.user.client.ui.Widget;
 
 public class PanelPrincipal extends Composite {
 
@@ -27,22 +34,58 @@ public class PanelPrincipal extends Composite {
 		mapWidget.setDraggable(true);
 		
 		
-		// painel do mapa
-		VerticalPanel panelCompleto = new VerticalPanel();
-		panelCompleto.setSpacing(10);
-		panelCompleto.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_CENTER);
+		VerticalPanel panelPrincipal = new VerticalPanel();
+		panelPrincipal.setSpacing(10);
+		panelPrincipal.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_CENTER);
 		
-		HorizontalPanel panelMapaEFiltros = new HorizontalPanel();
-		panelMapaEFiltros.setSpacing(10);
+		HorizontalPanel panelOpcoesEMapa = new HorizontalPanel();
+		panelOpcoesEMapa.setSpacing(10);
 		
-		DecoratorPanel decoratorPanelMapa = new DecoratorPanel();
-		decoratorPanelMapa.add(mapWidget);		
+		DecoratorPanel panelMapa = new DecoratorPanel();
+		panelMapa.add(mapWidget);		
 		
-		panelMapaEFiltros.add(decoratorPanelMapa);
+		panelOpcoesEMapa.add(criaPanelOpcao());
+		panelOpcoesEMapa.add(panelMapa);
 		
-		panelCompleto.add(panelMapaEFiltros);
+		panelPrincipal.add(criaDecoratorBanner());
+		panelPrincipal.add(panelOpcoesEMapa);
+		panelPrincipal.add(criaDecoratorRodape());
 		
-		initWidget(panelCompleto);
+		initWidget(panelPrincipal);
+	}
+
+
+	private DecoratorPanel criaDecoratorRodape() {
+		DecoratorPanel dPanel = new DecoratorPanel();		
+		dPanel.add(new Label("Desenvolvido por: Andre Aranha, Arnett Ruffino, Erickson Filipe, Jonathan Brilhante e Luan Barbosa"));
+		
+		return dPanel;
+	}
+	
+	
+	private DecoratorPanel criaPanelOpcao() {
+		DecoratorPanel dPanel = new DecoratorPanel();
+		
+		VerticalPanel vPanel = new VerticalPanel();
+		vPanel.setSpacing(10);
+		
+		vPanel.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_CENTER);
+		vPanel.add(new Button("Botao 1"));
+		vPanel.add(new Button("Botao 2"));
+		vPanel.add(new Button("Botao 3"));
+		vPanel.add(new Button("Botao 4"));
+		vPanel.add(new Button("Botao 5"));		
+		
+		dPanel.add(vPanel);
+		
+		return dPanel;
+	}
+	
+	private VerticalPanel criaDecoratorBanner() {
+		Image bannerPrincipal = new Image("http://lad.dsc.ufcg.edu.br/loac/uploads/OAC/UFCG_LOGO_pq.png");
+		VerticalPanel panelBanner = new VerticalPanel();
+		panelBanner.add(bannerPrincipal);
+		return panelBanner;
 	}
 	
 	
