@@ -23,6 +23,7 @@ public class PopupCadastrar extends PopupPanel {
 		super(false);
 		
 		setGlassEnabled(true);
+		setAnimationEnabled(true);
 		setTitle("Cadastrar Ocorrencia de Crime");
 		
 		vCadastrar = new VerticalPanel();
@@ -70,8 +71,13 @@ public class PopupCadastrar extends PopupPanel {
 		hPanelBotoes.setSpacing(10);
 	    
 	    Button bSalvar = new Button("Salvar");
+	    bSalvar.setWidth("100px");
+	    
 	    Button bLimpar = new Button("Limpar");
+	    bLimpar.setWidth("100px");
+	    
 	    Button bVoltar = new Button("Voltar");
+	    bVoltar.setWidth("100px");
 	    
 	    hPanelBotoes.add(bSalvar);
 	    hPanelBotoes.add(bLimpar);
@@ -112,6 +118,7 @@ public class PopupCadastrar extends PopupPanel {
 		vCadastrar.add(new Label("Crime Cadastrado!"));
 		
 		Button bOk = new Button("Ok");
+		bOk.setWidth("100px");
 		
 		bOk.addClickHandler(new ClickHandler() {
 			
