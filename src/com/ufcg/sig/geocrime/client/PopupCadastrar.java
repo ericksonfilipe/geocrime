@@ -3,6 +3,7 @@ package com.ufcg.sig.geocrime.client;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.PopupPanel;
@@ -12,20 +13,26 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 
 public class PopupCadastrar extends PopupPanel {
 	
+	private VerticalPanel vCadastrar;
+	private ListBox tipo;
+	private TextArea descricao;
+	private TextBox horario;
+	private TextBox data;
+	
 	public PopupCadastrar() {
 		super(false);
 		
 		setGlassEnabled(true);
 		setTitle("Cadastrar Ocorrencia de Crime");
 		
-		VerticalPanel vCadastrar = new VerticalPanel();
+		vCadastrar = new VerticalPanel();
 		vCadastrar.setSpacing(20);
 		vCadastrar.setWidth("500px");
 		
 		add(vCadastrar);
 
 		Label tipoLabel = new Label("Tipo");
-		ListBox tipo = new ListBox(false);
+		tipo = new ListBox(false);
 	    
 	    tipo.addItem("Arrombamento");
 	    tipo.addItem("Roubo de Carro");
@@ -37,17 +44,15 @@ public class PopupCadastrar extends PopupPanel {
 		tipo.setWidth("450px");
 		
 		Label descricaoLabel = new Label("Descricao:");
-		TextArea descricao = new TextArea();
+		descricao = new TextArea();
 		descricao.setWidth("450px");
 		descricao.setHeight("100px");
 		
 		Label horarioLabel = new Label("Horario:");
-	    TextBox horario = new TextBox();
+	    horario = new TextBox();
 	    
 	    Label dataLabel = new Label("Data:");
-	    TextBox data = new TextBox();
-	    
-	    Button bFechar = new Button("Fechar");
+	    data = new TextBox();
 
 	    vCadastrar.add(tipoLabel);
 		vCadastrar.add(tipo);
@@ -57,10 +62,58 @@ public class PopupCadastrar extends PopupPanel {
 		vCadastrar.add(horario);
 		vCadastrar.add(dataLabel);
 		vCadastrar.add(data);
-		vCadastrar.add(bFechar);
-		
+		vCadastrar.add(criaPanelBotoes());
+	}
+
+	private HorizontalPanel criaPanelBotoes() {
+		HorizontalPanel hPanelBotoes = new HorizontalPanel();
+		hPanelBotoes.setSpacing(10);
+	    
+	    Button bSalvar = new Button("Salvar");
+	    Button bLimpar = new Button("Limpar");
+	    Button bVoltar = new Button("Voltar");
+	    
+	    hPanelBotoes.add(bSalvar);
+	    hPanelBotoes.add(bLimpar);
+	    hPanelBotoes.add(bVoltar);
+	    
+	    bVoltar.addClickHandler(new ClickHandler() {
+			
+			@Override
+			public void onClick(ClickEvent event) {
+				hide();
+			}
+		});
+	    
+	    bLimpar.addClickHandler(new ClickHandler() {
+			
+			@Override
+			public void onClick(ClickEvent event) {
+				 tipo.setItemSelected(0, true);
+				 descricao.setText("");
+				 horario.setText("");
+				 data.setText("");
+			}
+		});
+	    
+	    bSalvar.addClickHandler(new ClickHandler() {
+			
+			@Override
+			public void onClick(ClickEvent event) {
+				finalizaCadastro();
+			}
+		});
+	    
+		return hPanelBotoes;
+	}
 	
-		bFechar.addClickHandler(new ClickHandler() {
+	private void finalizaCadastro() {
+		vCadastrar.clear();
+		vCadastrar.add(new Label("Crime Cadastrado!"));
+		
+		Button bOk = new Button("Ok");
+		
+		bOk.addClickHandler(new ClickHandler() {
 			
 			@Override
 			public void onClick(ClickEvent event) {
@@ -68,6 +121,24 @@ public class PopupCadastrar extends PopupPanel {
 			}
 		});
 		
-		
+		vCadastrar.add(bOk);
 	}
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

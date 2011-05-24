@@ -10,7 +10,6 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DecoratorPanel;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
-import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
@@ -50,7 +49,6 @@ public class PanelPrincipal extends Composite {
 		panelOpcoesEMapa.add(dPanel);
 		panelOpcoesEMapa.add(panelMapa);
 		
-		panelPrincipal.add(criaDecoratorBanner());
 		panelPrincipal.add(panelOpcoesEMapa);
 		panelPrincipal.add(criaDecoratorRodape());
 		
@@ -97,13 +95,5 @@ public class PanelPrincipal extends Composite {
 
 		return panelOpcao;
 	}
-	
-	private VerticalPanel criaDecoratorBanner() {
-		Image bannerPrincipal = new Image("http://lad.dsc.ufcg.edu.br/loac/uploads/OAC/UFCG_LOGO_pq.png");
-		VerticalPanel panelBanner = new VerticalPanel();
-		panelBanner.add(bannerPrincipal);
-		return panelBanner;
-	}
-	
 	
 }
