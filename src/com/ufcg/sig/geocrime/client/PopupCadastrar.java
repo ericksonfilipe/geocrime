@@ -3,6 +3,7 @@ package com.ufcg.sig.geocrime.client;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
@@ -18,6 +19,7 @@ public class PopupCadastrar extends PopupPanel {
 	private TextArea descricao;
 	private TextBox horario;
 	private TextBox data;
+	private TextBox local;
 	
 	public PopupCadastrar() {
 		super(false);
@@ -31,7 +33,10 @@ public class PopupCadastrar extends PopupPanel {
 		vCadastrar.setWidth("500px");
 		
 		add(vCadastrar);
-
+		
+		Label localLabel = new Label("Local");
+		local = new TextBox();
+		
 		Label tipoLabel = new Label("Tipo");
 		tipo = new ListBox(false);
 	    
@@ -55,6 +60,8 @@ public class PopupCadastrar extends PopupPanel {
 	    Label dataLabel = new Label("Data:");
 	    data = new TextBox();
 
+	    vCadastrar.add(localLabel);
+	    vCadastrar.add(local);
 	    vCadastrar.add(tipoLabel);
 		vCadastrar.add(tipo);
 		vCadastrar.add(descricaoLabel);
@@ -116,6 +123,8 @@ public class PopupCadastrar extends PopupPanel {
 	private void finalizaCadastro() {
 		vCadastrar.clear();
 		vCadastrar.add(new Label("Crime Cadastrado!"));
+		
+		vCadastrar.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_CENTER);
 		
 		Button bOk = new Button("Ok");
 		bOk.setWidth("100px");

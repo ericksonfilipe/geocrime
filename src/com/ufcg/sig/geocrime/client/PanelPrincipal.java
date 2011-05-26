@@ -4,7 +4,9 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.maps.client.MapUIOptions;
 import com.google.gwt.maps.client.MapWidget;
+import com.google.gwt.maps.client.event.MapClickHandler;
 import com.google.gwt.maps.client.geom.LatLng;
+import com.google.gwt.maps.client.overlay.Marker;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DecoratorPanel;
@@ -13,25 +15,29 @@ import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
 public class PanelPrincipal extends Composite {
 
-	private MapWidget mapWidget;
+	private MapWidget mapa;
 	private VerticalPanel panelPrincipal;
+	private Label lbMesagens;
+	private Marker localCrime;
 	
 	public PanelPrincipal() {
 		// coisas do mapa
-		mapWidget = new MapWidget(LatLng.newInstance(-7.231188, -35.886669), 13);
-		mapWidget.setSize("900px", "600px");
+		mapa = new MapWidget(LatLng.newInstance(-7.231188, -35.886669), 13);
+		mapa.setSize("900px", "600px");
+		mapa.setCenter(LatLng.newInstance(-7.228633,-35.891991), 13);
 		
-		MapUIOptions options = mapWidget.getDefaultUI();
+		MapUIOptions options = mapa.getDefaultUI();
 		options.setScrollwheel(true);
 		options.setDoubleClick(false);
 		options.setLargeMapControl3d(true);
-		mapWidget.setUI(options);
-		mapWidget.setDoubleClickZoom(false);
-		mapWidget.setDraggable(true);
+		mapa.setUI(options);
+		mapa.setDoubleClickZoom(false);
+		mapa.setDraggable(true);
 		
 		
 		panelPrincipal = new VerticalPanel();
@@ -42,7 +48,7 @@ public class PanelPrincipal extends Composite {
 		panelOpcoesEMapa.setSpacing(10);
 		
 		DecoratorPanel panelMapa = new DecoratorPanel();
-		panelMapa.add(mapWidget);		
+		panelMapa.add(mapa);		
 				
 		DecoratorPanel dPanelMenu = new DecoratorPanel(); 
 		dPanelMenu.add(criaPanelMenu());
@@ -50,16 +56,33 @@ public class PanelPrincipal extends Composite {
 		DecoratorPanel dPanelOpcao = new DecoratorPanel(); 
 		dPanelOpcao.add(criaPanelOpcao());
 		
+		lbMesagens = new Label("Bem vindo ao GeoCrime!");
+		lbMesagens.setStyleName("labelAvisos");                             // colocar css nesse label!
+		
+		DecoratorPanel dPanelAvisos = new DecoratorPanel();
+		dPanelAvisos.add(criaPanelAviso());
+		
 		panelOpcoesEMapa.add(dPanelOpcao);
 		panelOpcoesEMapa.add(panelMapa);
 		
 		
+		
 		panelPrincipal.add(dPanelMenu);
+		panelPrincipal.add(dPanelAvisos);
 		panelPrincipal.add(panelOpcoesEMapa);
 		
 		initWidget(panelPrincipal);
 	}
 
+	
+	private VerticalPanel criaPanelAviso() {
+		VerticalPanel panelAviso = new VerticalPanel();
+		panelAviso.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_LEFT);
+		panelAviso.add(lbMesagens);
+		
+		return panelAviso;
+	}
+	
 
 	private HorizontalPanel criaPanelMenu() {
 		HorizontalPanel hPanelMenu = new HorizontalPanel();
@@ -155,9 +178,40 @@ public class PanelPrincipal extends Composite {
 			
 			@Override
 			public void onClick(ClickEvent event) {
-				PopupCadastrar popupCadastrar = new PopupCadastrar();
-				popupCadastrar.center();
-				popupCadastrar.show();
+				lbMesagens.setText("Marque no mapa onde ocorreu o crime!");
+				
+				mapa.addMapClickHandler(new MapClickHandler() {
+				
+				@Override
+				public void onClick(MapClickEvent event) {
+											
+					LatLng ponto = event.getLatLng();
+					localCrime = new Marker(ponto);
+					mapa.addOverlay(localCrime);
+					
+//					Geocoder geo = new Geocoder();
+//					String endereco = geo.getLocations(ponto, new LocationCallback() {
+//						
+//						@Override
+//						public void onSuccess(JsArray<Placemark> locations) {
+//							// TODO Auto-generated method stub
+//							
+//						}
+//						
+//						@Override
+//						public void onFailure(int statusCode) {
+//							// TODO Auto-generated method stub
+//							
+//						}
+//					});
+					
+					PopupCadastrar popupCadastrar = new PopupCadastrar();
+					popupCadastrar.center();
+					popupCadastrar.show();
+				}
+				
+			});
+			
 			}
 			
 		});
