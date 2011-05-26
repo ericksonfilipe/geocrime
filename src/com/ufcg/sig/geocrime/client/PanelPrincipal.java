@@ -1,10 +1,14 @@
 package com.ufcg.sig.geocrime.client;
 
+import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.maps.client.MapUIOptions;
 import com.google.gwt.maps.client.MapWidget;
 import com.google.gwt.maps.client.event.MapClickHandler;
+import com.google.gwt.maps.client.geocode.Geocoder;
+import com.google.gwt.maps.client.geocode.LocationCallback;
+import com.google.gwt.maps.client.geocode.Placemark;
 import com.google.gwt.maps.client.geom.LatLng;
 import com.google.gwt.maps.client.overlay.Marker;
 import com.google.gwt.user.client.ui.Button;
@@ -24,6 +28,7 @@ public class PanelPrincipal extends Composite {
 	private VerticalPanel panelPrincipal;
 	private Label lbMesagens;
 	private Marker localCrime;
+	private String enderecoCrime;
 	
 	public PanelPrincipal() {
 		// coisas do mapa
@@ -187,23 +192,30 @@ public class PanelPrincipal extends Composite {
 											
 					LatLng ponto = event.getLatLng();
 					localCrime = new Marker(ponto);
-					mapa.addOverlay(localCrime);
+
+					Geocoder geo = new Geocoder();
 					
-//					Geocoder geo = new Geocoder();
-//					geo.getLocations(ponto, new LocationCallback() {
-//						
-//						@Override
-//						public void onSuccess(JsArray<Placemark> locations) {
-//							localCrime = locations.get(0).getAddress();
-//						}
-//						
-//						@Override
-//						public void onFailure(int statusCode) {}
-//					});
-					
-					PopupCadastrar popupCadastrar = new PopupCadastrar();
-					popupCadastrar.center();
-					popupCadastrar.show();
+					geo.getLocations(ponto, new LocationCallback() {
+						
+						@Override
+						public void onSuccess(JsArray<Placemark> locations) {
+							
+							enderecoCrime = locations.get(0).getAddress();
+
+							PopupCadastrar popupCadastrar = new PopupCadastrar(enderecoCrime);
+							popupCadastrar.center();
+							popupCadastrar.show();
+
+							// ATENCAO: ele tem tempos diferentes, marcando na hora errada ou nao marcando...
+							if (popupCadastrar.salvou()) {								
+								mapa.addOverlay(localCrime);
+							}
+						}
+						
+						@Override
+						public void onFailure(int statusCode) {}
+						
+					});					
 				}
 				
 			});

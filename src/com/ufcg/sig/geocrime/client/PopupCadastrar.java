@@ -21,7 +21,9 @@ public class PopupCadastrar extends PopupPanel {
 	private TextBox data;
 	private TextBox local;
 	
-	public PopupCadastrar() {
+	private boolean salvou = true;
+	
+	public PopupCadastrar(String endereco) {
 		super(false);
 		
 		setGlassEnabled(true);
@@ -36,6 +38,8 @@ public class PopupCadastrar extends PopupPanel {
 		
 		Label localLabel = new Label("Local");
 		local = new TextBox();
+		local.setWidth("450px");
+		local.setText(endereco);
 		
 		Label tipoLabel = new Label("Tipo");
 		tipo = new ListBox(false);
@@ -73,6 +77,12 @@ public class PopupCadastrar extends PopupPanel {
 		vCadastrar.add(criaPanelBotoes());
 	}
 
+	
+	public boolean salvou() {
+		return salvou;
+	}
+	
+
 	private HorizontalPanel criaPanelBotoes() {
 		HorizontalPanel hPanelBotoes = new HorizontalPanel();
 		hPanelBotoes.setSpacing(10);
@@ -83,17 +93,18 @@ public class PopupCadastrar extends PopupPanel {
 	    Button bLimpar = new Button("Limpar");
 	    bLimpar.setWidth("100px");
 	    
-	    Button bVoltar = new Button("Voltar");
-	    bVoltar.setWidth("100px");
+	    Button bCancelar = new Button("Cancelar");
+	    bCancelar.setWidth("100px");
 	    
 	    hPanelBotoes.add(bSalvar);
 	    hPanelBotoes.add(bLimpar);
-	    hPanelBotoes.add(bVoltar);
+	    hPanelBotoes.add(bCancelar);
 	    
-	    bVoltar.addClickHandler(new ClickHandler() {
+	    bCancelar.addClickHandler(new ClickHandler() {
 			
 			@Override
 			public void onClick(ClickEvent event) {
+				salvou = false;
 				hide();
 			}
 		});
@@ -113,6 +124,7 @@ public class PopupCadastrar extends PopupPanel {
 			
 			@Override
 			public void onClick(ClickEvent event) {
+				salvou = true;
 				finalizaCadastro();
 			}
 		});
