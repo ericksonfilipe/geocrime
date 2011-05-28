@@ -55,9 +55,6 @@ public class PanelPrincipal extends Composite {
 		DecoratorPanel panelMapa = new DecoratorPanel();
 		panelMapa.add(mapa);		
 				
-		DecoratorPanel dPanelMenu = new DecoratorPanel(); 
-		dPanelMenu.add(criaPanelMenu());
-
 		DecoratorPanel dPanelOpcao = new DecoratorPanel(); 
 		dPanelOpcao.add(criaPanelOpcao());
 		
@@ -70,9 +67,7 @@ public class PanelPrincipal extends Composite {
 		panelOpcoesEMapa.add(dPanelOpcao);
 		panelOpcoesEMapa.add(panelMapa);
 		
-		
-		
-		panelPrincipal.add(dPanelMenu);
+		panelPrincipal.add(criaPanelMenu());
 		panelPrincipal.add(dPanelAvisos);
 		panelPrincipal.add(panelOpcoesEMapa);
 		
@@ -187,36 +182,30 @@ public class PanelPrincipal extends Composite {
 				
 				mapa.addMapClickHandler(new MapClickHandler() {
 				
-				@Override
-				public void onClick(MapClickEvent event) {
-											
-					LatLng ponto = event.getLatLng();
-					localCrime = new Marker(ponto);
-
-					Geocoder geo = new Geocoder();
-					
-					geo.getLocations(ponto, new LocationCallback() {
+					@Override
+					public void onClick(MapClickEvent event) {
 						
-						@Override
-						public void onSuccess(JsArray<Placemark> locations) {
+						LatLng ponto = event.getLatLng();
+						localCrime = new Marker(ponto);
+						
+						Geocoder geo = new Geocoder();
+						
+						geo.getLocations(ponto, new LocationCallback() {
 							
-							enderecoCrime = locations.get(0).getAddress();
-
-							PopupCadastrar popupCadastrar = new PopupCadastrar(enderecoCrime);
-							popupCadastrar.center();
-							popupCadastrar.show();
-
-							// ATENCAO: ele tem tempos diferentes, marcando na hora errada ou nao marcando...
-							if (popupCadastrar.salvou()) {								
-								mapa.addOverlay(localCrime);
+							@Override
+							public void onSuccess(JsArray<Placemark> locations) {
+								
+								enderecoCrime = locations.get(0).getAddress();
+								
+								PopupCadastrar popupCadastrar = PopupCadastrar.getInstance(enderecoCrime, localCrime, mapa);
+								popupCadastrar.mostrarTela();
 							}
-						}
-						
-						@Override
-						public void onFailure(int statusCode) {}
-						
-					});					
-				}
+							
+							@Override
+							public void onFailure(int statusCode) {}
+							
+						});					
+					}
 				
 			});
 			
