@@ -2,8 +2,14 @@ package com.ufcg.sig.geocrime.client;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.maps.client.MapWidget;
+import com.google.gwt.maps.client.geocode.Geocoder;
+import com.google.gwt.maps.client.geocode.LatLngCallback;
+import com.google.gwt.maps.client.geom.LatLng;
+import com.google.gwt.maps.client.overlay.Marker;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
+import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
@@ -20,11 +26,25 @@ public class PopupCadastrar extends PopupPanel {
 	private TextBox horario;
 	private TextBox data;
 	private TextBox local;
+	private MapWidget mapa;
+	private Marker marcador;
 	
-	private boolean salvou = true;
+	private boolean modificouLocal = false;
 	
-	public PopupCadastrar(String endereco) {
+	private static PopupCadastrar popupInstance;
+	 
+    public static PopupCadastrar getInstance(String endereco, Marker marcador, MapWidget mapa){
+          if(popupInstance == null) {
+               popupInstance = new PopupCadastrar(endereco, marcador, mapa);
+          }
+                   
+          return popupInstance;
+    }
+	
+	private PopupCadastrar(String endereco, Marker localMk, MapWidget map) {
 		super(false);
+		mapa = map;
+		marcador = localMk;
 		
 		setGlassEnabled(true);
 		setAnimationEnabled(true);
@@ -35,27 +55,37 @@ public class PopupCadastrar extends PopupPanel {
 		vCadastrar.setWidth("500px");
 		
 		add(vCadastrar);
+	   
+	    vCadastrar.add(criaPanelLocal(endereco));
+	    vCadastrar.add(criaCorpoPopup());
+	    vCadastrar.add(criaPanelBotoes());
+	}
+	
+	private VerticalPanel criaCorpoPopup() {
 		
-		Label localLabel = new Label("Local");
-		local = new TextBox();
-		local.setWidth("450px");
-		local.setText(endereco);
+		VerticalPanel vPanelCampos = new VerticalPanel();
+		vPanelCampos.setSpacing(7);
+		vPanelCampos.setWidth("490px");
 		
-		Label tipoLabel = new Label("Tipo");
+		Label tipoLabel = new Label("Tipo:");
 		tipo = new ListBox(false);
-	    
-	    tipo.addItem("Arrombamento");
-	    tipo.addItem("Roubo de Carro");
-	    tipo.addItem("Assassinato");
-	    tipo.addItem("Assalto");
-	    tipo.addItem("...");
 
-	    tipo.setVisibleItemCount(3);
-		tipo.setWidth("450px");
+	    
+	    tipo.addItem("Assalto");
+	    tipo.addItem("Atropelamento");
+	    tipo.addItem("Furto");
+	    tipo.addItem("Homicidio");
+	    tipo.addItem("Roubo de Veiculo");
+	    tipo.addItem("Uso/Venda de Drogas");
+	    tipo.addItem("Vandalismo");
+	    tipo.addItem("Outro");
+
+	    tipo.setVisibleItemCount(1);
+		tipo.setWidth("400px");
 		
 		Label descricaoLabel = new Label("Descricao:");
 		descricao = new TextArea();
-		descricao.setWidth("450px");
+		descricao.setWidth("395px");
 		descricao.setHeight("100px");
 		
 		Label horarioLabel = new Label("Horario:");
@@ -63,38 +93,78 @@ public class PopupCadastrar extends PopupPanel {
 	    
 	    Label dataLabel = new Label("Data:");
 	    data = new TextBox();
-
-	    vCadastrar.add(localLabel);
-	    vCadastrar.add(local);
-	    vCadastrar.add(tipoLabel);
-		vCadastrar.add(tipo);
-		vCadastrar.add(descricaoLabel);
-		vCadastrar.add(descricao);
-		vCadastrar.add(horarioLabel);
-		vCadastrar.add(horario);
-		vCadastrar.add(dataLabel);
-		vCadastrar.add(data);
-		vCadastrar.add(criaPanelBotoes());
+		
+	    vPanelCampos.add(tipoLabel);
+	    vPanelCampos.add(tipo);
+	    vPanelCampos.add(descricaoLabel);
+	    vPanelCampos.add(descricao);
+	    vPanelCampos.add(horarioLabel);
+	    vPanelCampos.add(horario);
+	    vPanelCampos.add(dataLabel);
+	    vPanelCampos.add(data);
+	    
+	    
+		return vPanelCampos;
 	}
 
-	
-	public boolean salvou() {
-		return salvou;
+
+
+	private HorizontalPanel criaPanelLocal(String endereco) {
+		
+		HorizontalPanel hPanel = new HorizontalPanel();
+		hPanel.setSpacing(10);
+		hPanel.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
+		hPanel.setWidth("450px");
+		hPanel.setStyleName("localCrime");
+				
+		Label localLabel = new Label("Local:");
+		
+		local = new TextBox();
+		local.setText(endereco);
+		local.setEnabled(false);
+		local.setWidth("330px");
+		
+		Button botaoEditarLocal = new Button("Editar");
+		botaoEditarLocal.setWidth("80px");
+		botaoEditarLocal.setHeight("25px");
+		
+		botaoEditarLocal.addClickHandler(new ClickHandler() {
+			
+			@Override
+			public void onClick(ClickEvent event) {
+				local.setEnabled(true);
+				modificouLocal = true;
+			}
+		});
+		
+		hPanel.add(localLabel);
+		hPanel.add(local);
+		hPanel.add(botaoEditarLocal);
+		
+		return hPanel;
 	}
-	
+
+
 
 	private HorizontalPanel criaPanelBotoes() {
 		HorizontalPanel hPanelBotoes = new HorizontalPanel();
-		hPanelBotoes.setSpacing(10);
+		hPanelBotoes.setSpacing(7);
+		hPanelBotoes.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_CENTER);
+		hPanelBotoes.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
+		hPanelBotoes.setWidth("490px");
+		hPanelBotoes.setStyleName("botoesCadastrar");
 	    
 	    Button bSalvar = new Button("Salvar");
-	    bSalvar.setWidth("100px");
+	    bSalvar.setWidth("150px");
+	    bSalvar.setHeight("25px");
 	    
 	    Button bLimpar = new Button("Limpar");
-	    bLimpar.setWidth("100px");
+	    bLimpar.setWidth("150px");
+	    bLimpar.setHeight("25px");
 	    
 	    Button bCancelar = new Button("Cancelar");
-	    bCancelar.setWidth("100px");
+	    bCancelar.setWidth("150px");
+	    bCancelar.setHeight("25px");
 	    
 	    hPanelBotoes.add(bSalvar);
 	    hPanelBotoes.add(bLimpar);
@@ -104,8 +174,8 @@ public class PopupCadastrar extends PopupPanel {
 			
 			@Override
 			public void onClick(ClickEvent event) {
-				salvou = false;
 				hide();
+				popupInstance = null;
 			}
 		});
 	    
@@ -124,7 +194,23 @@ public class PopupCadastrar extends PopupPanel {
 			
 			@Override
 			public void onClick(ClickEvent event) {
-				salvou = true;
+				if (modificouLocal) {
+					Geocoder geo = new Geocoder();
+					
+					geo.getLatLng(local.getText(), new LatLngCallback() {
+						
+						@Override
+						public void onSuccess(LatLng point) {
+							marcador.setLatLng(point);
+						}
+						
+						@Override
+						public void onFailure() {}
+					});
+					
+				}
+					
+				mapa.addOverlay(marcador);
 				finalizaCadastro();
 			}
 		});
@@ -146,10 +232,16 @@ public class PopupCadastrar extends PopupPanel {
 			@Override
 			public void onClick(ClickEvent event) {
 				hide();
+				popupInstance = null;
 			}
 		});
 		
 		vCadastrar.add(bOk);
+	}
+
+	public void mostrarTela() {
+		center();
+		show();
 	}
 }
 
