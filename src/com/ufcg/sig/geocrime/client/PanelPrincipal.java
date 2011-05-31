@@ -7,11 +7,12 @@ import com.google.gwt.maps.client.MapUIOptions;
 import com.google.gwt.maps.client.MapWidget;
 import com.google.gwt.maps.client.event.MapClickHandler;
 import com.google.gwt.maps.client.geocode.Geocoder;
+import com.google.gwt.maps.client.geocode.LatLngCallback;
 import com.google.gwt.maps.client.geocode.LocationCallback;
 import com.google.gwt.maps.client.geocode.Placemark;
 import com.google.gwt.maps.client.geom.LatLng;
-import com.google.gwt.maps.client.overlay.Marker;
 import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DecoratorPanel;
 import com.google.gwt.user.client.ui.DialogBox;
@@ -20,6 +21,7 @@ import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
 public class PanelPrincipal extends Composite {
@@ -27,11 +29,40 @@ public class PanelPrincipal extends Composite {
 	private MapWidget mapa;
 	private VerticalPanel panelPrincipal;
 	private Label lbMesagens;
-	private Marker localCrime;
 	private String enderecoCrime;
+	private MapClickHandler 	clicaMapa;
 	
 	public PanelPrincipal() {
-		// coisas do mapa
+		
+		criarEConfigurarMapa();
+		
+		panelPrincipal = new VerticalPanel();
+		panelPrincipal.setSpacing(10);
+		panelPrincipal.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_CENTER);
+		panelPrincipal.setWidth("100%");
+		
+		HorizontalPanel panelOpcoesEMapa = new HorizontalPanel();
+		panelOpcoesEMapa.setSpacing(10);
+
+		DecoratorPanel panelMapa = new DecoratorPanel();
+		panelMapa.add(mapa);	
+		
+		lbMesagens = new Label("Bem vindo ao GeoCrime!");
+		lbMesagens.setStyleName("labelAvisos");
+
+		panelOpcoesEMapa.add(criaPanelOpcao());
+		panelOpcoesEMapa.add(panelMapa);
+		
+		panelPrincipal.add(criaPanelMenu());
+		panelPrincipal.add(criaPanelAviso());
+		panelPrincipal.add(criaPanelConsultaEBairro());
+		panelPrincipal.add(panelOpcoesEMapa);
+		
+		initWidget(panelPrincipal);
+	}
+
+	
+	private void criarEConfigurarMapa() {
 		mapa = new MapWidget(LatLng.newInstance(-7.231188, -35.886669), 13);
 		mapa.setSize("900px", "600px");
 		mapa.setCenter(LatLng.newInstance(-7.228633,-35.891991), 13);
@@ -43,41 +74,63 @@ public class PanelPrincipal extends Composite {
 		mapa.setUI(options);
 		mapa.setDoubleClickZoom(false);
 		mapa.setDraggable(true);
-		
-		
-		panelPrincipal = new VerticalPanel();
-		panelPrincipal.setSpacing(10);
-		panelPrincipal.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_CENTER);
-		
-		HorizontalPanel panelOpcoesEMapa = new HorizontalPanel();
-		panelOpcoesEMapa.setSpacing(10);
-		
-		DecoratorPanel panelMapa = new DecoratorPanel();
-		panelMapa.add(mapa);		
-				
-		DecoratorPanel dPanelOpcao = new DecoratorPanel(); 
-		dPanelOpcao.add(criaPanelOpcao());
-		
-		lbMesagens = new Label("Bem vindo ao GeoCrime!");
-		lbMesagens.setStyleName("labelAvisos");                             // colocar css nesse label!
-		
-		DecoratorPanel dPanelAvisos = new DecoratorPanel();
-		dPanelAvisos.add(criaPanelAviso());
-		
-		panelOpcoesEMapa.add(dPanelOpcao);
-		panelOpcoesEMapa.add(panelMapa);
-		
-		panelPrincipal.add(criaPanelMenu());
-		panelPrincipal.add(dPanelAvisos);
-		panelPrincipal.add(panelOpcoesEMapa);
-		
-		initWidget(panelPrincipal);
 	}
 
-	
+
+	private HorizontalPanel criaPanelConsultaEBairro() {
+		HorizontalPanel hPanelConsultaEBairro = new HorizontalPanel();
+		
+		hPanelConsultaEBairro.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_RIGHT);
+		hPanelConsultaEBairro.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
+				
+		CheckBox mostrarBairro = new CheckBox("Mostrar Bairros");
+		mostrarBairro.setValue(true);
+
+		hPanelConsultaEBairro.add(criaPanelConsultar());
+		hPanelConsultaEBairro.add(mostrarBairro);
+		return hPanelConsultaEBairro;
+	}
+
+
+	private HorizontalPanel criaPanelConsultar() {
+		
+		HorizontalPanel hPanelConsultar = new HorizontalPanel();
+		hPanelConsultar.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_RIGHT);
+		hPanelConsultar.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
+		
+		Label labelPesquisar = new Label("Pesquisar:");
+		final TextBox campoPesquisa = new TextBox();
+		Button botaoPesquisar = new Button("Pesquisar");
+		
+		botaoPesquisar.addClickHandler(new ClickHandler() {
+			
+			@Override
+			public void onClick(ClickEvent event) {
+				Geocoder geo = new Geocoder();
+				geo.getLatLng(campoPesquisa.getText() + " - Campina Grande - Paraiba", new LatLngCallback() {
+					
+					@Override
+					public void onSuccess(LatLng point) {
+						mapa.setCenter(point, 17);				
+					}
+					
+					@Override
+					public void onFailure() {}
+				});
+			}
+		});
+		
+		hPanelConsultar.add(labelPesquisar);
+		hPanelConsultar.add(campoPesquisa);
+		hPanelConsultar.add(botaoPesquisar);
+		
+		return hPanelConsultar;
+	}
+
+
 	private VerticalPanel criaPanelAviso() {
 		VerticalPanel panelAviso = new VerticalPanel();
-		panelAviso.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_LEFT);
+		panelAviso.setStyleName("avisos");
 		panelAviso.add(lbMesagens);
 		
 		return panelAviso;
@@ -86,19 +139,23 @@ public class PanelPrincipal extends Composite {
 
 	private HorizontalPanel criaPanelMenu() {
 		HorizontalPanel hPanelMenu = new HorizontalPanel();
-		hPanelMenu.setSpacing(20);
-		hPanelMenu.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
 		
 		Button bHome = new Button("Principal");
-		bHome.setWidth("100px");
+		bHome.setWidth("300px");
 				
 		Button bSobre = new Button("Sobre");
-		bSobre.setWidth("100px");
+		bSobre.setWidth("300px");
+
+		Button bEquipe = new Button("Equipe");
+		bEquipe.setWidth("300px");
 		
 		final DialogBox dialogSobre = createDialogBox("Sobre - GeoCrime", "Este eh o projeto de <b>SIG 2011.1</b>  :D");
 		dialogSobre.setGlassEnabled(true);
 		dialogSobre.setAnimationEnabled(true);
 		
+		final DialogBox dialogEquipe = createDialogBox("Equipe - GeoCrime", "<br />Andre Aranha<br /> Arnett Ruffino<br /> Erickson Filipe<br /> Jonathan Brilhante<br /> Luan Barbosa<br /><br />");
+		dialogEquipe.setGlassEnabled(true);
+		dialogEquipe.setAnimationEnabled(true);
 		bSobre.addClickHandler(new ClickHandler() {
 			
 			@Override
@@ -107,13 +164,6 @@ public class PanelPrincipal extends Composite {
 				dialogSobre.show();
 			}
 		});
-		
-		Button bEquipe = new Button("Equipe");
-		bEquipe.setWidth("100px");
-		
-		final DialogBox dialogEquipe = createDialogBox("Equipe - GeoCrime", "<br />Andre Aranha<br /> Arnett Ruffino<br /> Erickson Filipe<br /> Jonathan Brilhante<br /> Luan Barbosa<br /><br />");
-		dialogEquipe.setGlassEnabled(true);
-		dialogEquipe.setAnimationEnabled(true);
 		
 		bEquipe.addClickHandler(new ClickHandler() {
 			
@@ -178,16 +228,16 @@ public class PanelPrincipal extends Composite {
 			
 			@Override
 			public void onClick(ClickEvent event) {
+				
 				lbMesagens.setText("Marque no mapa onde ocorreu o crime!");
 				
-				mapa.addMapClickHandler(new MapClickHandler() {
-				
+				clicaMapa = new MapClickHandler() {
+					
 					@Override
 					public void onClick(MapClickEvent event) {
-						
-						LatLng ponto = event.getLatLng();
-						localCrime = new Marker(ponto);
-						
+
+						final LatLng ponto = event.getLatLng();
+
 						Geocoder geo = new Geocoder();
 						
 						geo.getLocations(ponto, new LocationCallback() {
@@ -197,17 +247,20 @@ public class PanelPrincipal extends Composite {
 								
 								enderecoCrime = locations.get(0).getAddress();
 								
-								PopupCadastrar popupCadastrar = PopupCadastrar.getInstance(enderecoCrime, localCrime, mapa);
+								PopupCadastrar popupCadastrar = PopupCadastrar.getInstance(enderecoCrime, ponto, mapa);
 								popupCadastrar.mostrarTela();
 							}
 							
 							@Override
 							public void onFailure(int statusCode) {}
 							
-						});					
+						});	
+					
 					}
 				
-			});
+				};
+				
+				mapa.addMapClickHandler(clicaMapa);
 			
 			}
 			
@@ -240,4 +293,25 @@ public class PanelPrincipal extends Composite {
 		return vPanel;
 	}
 	
+	public void consultarRua(String rua) {
+		Geocoder geo = new Geocoder();
+		
+		geo.getLatLng(rua + " - Campina Grande - Paraiba", new LatLngCallback() {
+			
+			@Override
+			public void onSuccess(LatLng point) {
+				mapa.setCenter(point, 16);				
+			}
+			
+			@Override
+			public void onFailure() {				
+			}
+		});
+	}
+	
 }
+
+
+
+
+
