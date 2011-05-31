@@ -33,22 +33,21 @@ public class PopupCadastrar extends PopupPanel {
 	
 	private static PopupCadastrar popupInstance;
 	 
-    public static PopupCadastrar getInstance(String endereco, Marker marcador, MapWidget mapa){
+    public static PopupCadastrar getInstance(String endereco, LatLng ponto, MapWidget mapa){
           if(popupInstance == null) {
-               popupInstance = new PopupCadastrar(endereco, marcador, mapa);
+               popupInstance = new PopupCadastrar(endereco, ponto, mapa);
           }
                    
           return popupInstance;
     }
 	
-	private PopupCadastrar(String endereco, Marker localMk, MapWidget map) {
+	private PopupCadastrar(String endereco, LatLng ponto, MapWidget map) {
 		super(false);
 		mapa = map;
-		marcador = localMk;
+		marcador = new Marker(ponto);
 		
 		setGlassEnabled(true);
 		setAnimationEnabled(true);
-		setTitle("Cadastrar Ocorrencia de Crime");
 		
 		vCadastrar = new VerticalPanel();
 		vCadastrar.setSpacing(20);
@@ -56,6 +55,15 @@ public class PopupCadastrar extends PopupPanel {
 		
 		add(vCadastrar);
 	   
+		Label tituloPopup = new Label("Cadastro de Crime");
+		tituloPopup.setStyleName("tituloCadastro");
+		
+		VerticalPanel paneTitulo = new VerticalPanel();
+		paneTitulo.setWidth("500px");
+		paneTitulo.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_CENTER);
+		paneTitulo.add(tituloPopup);
+		
+		vCadastrar.add(paneTitulo);
 	    vCadastrar.add(criaPanelLocal(endereco));
 	    vCadastrar.add(criaCorpoPopup());
 	    vCadastrar.add(criaPanelBotoes());
@@ -145,7 +153,6 @@ public class PopupCadastrar extends PopupPanel {
 	}
 
 
-
 	private HorizontalPanel criaPanelBotoes() {
 		HorizontalPanel hPanelBotoes = new HorizontalPanel();
 		hPanelBotoes.setSpacing(7);
@@ -209,8 +216,9 @@ public class PopupCadastrar extends PopupPanel {
 					});
 					
 				}
-					
+				
 				mapa.addOverlay(marcador);
+				
 				finalizaCadastro();
 			}
 		});
@@ -220,7 +228,16 @@ public class PopupCadastrar extends PopupPanel {
 	
 	private void finalizaCadastro() {
 		vCadastrar.clear();
-		vCadastrar.add(new Label("Crime Cadastrado!"));
+		
+		Label avisoCasdastrado = new Label("Crime Cadastrado!");
+		avisoCasdastrado.setStyleName("cadastrado");
+		
+		VerticalPanel paneCadastrado = new VerticalPanel();
+		paneCadastrado.setWidth("500px");
+		paneCadastrado.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_CENTER);
+		paneCadastrado.add(avisoCasdastrado);
+		
+		vCadastrar.add(paneCadastrado);
 		
 		vCadastrar.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_CENTER);
 		
