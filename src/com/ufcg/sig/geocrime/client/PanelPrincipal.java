@@ -22,6 +22,7 @@ import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.PasswordTextBox;
+import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
@@ -211,7 +212,6 @@ public class PanelPrincipal extends Composite {
 		final DialogBox dialogBox = new DialogBox();
 		dialogBox.setText("Login - Area Restrita");
 		
-		// Create a table to layout the content
 		VerticalPanel vPanelComponentes = new VerticalPanel();
 		vPanelComponentes.setSpacing(10);
 		dialogBox.setWidget(vPanelComponentes);
@@ -219,7 +219,6 @@ public class PanelPrincipal extends Composite {
 		HorizontalPanel hPanelBotoes = new HorizontalPanel();
 		hPanelBotoes.setSpacing(10);
 		
-		// Add a close button at the bottom of the dialog
 		Button bCancelar = new Button(
 				"Cancelar", new ClickHandler() {
 					public void onClick(ClickEvent event) {
@@ -243,13 +242,14 @@ public class PanelPrincipal extends Composite {
 			
 			@Override
 			public void onClick(ClickEvent event) {
-				if (login.getText().equals("") || senha.getText().equals("")) {
-					dialogBox.setText("Ha campos vazios!!!!!");
-				}
-				else if (login.getText().equals("eu") && senha.getText().equals("123")){  // <------------- modificar para o BD
-					dialogBox.setText("Logoooooooooooooou!!!!!");
-					// abrir painel pra cadastro de viaturas e tal...
-				}
+//				if (login.getText().equals("") || senha.getText().equals("")) {
+//					dialogBox.setText("Ha campos vazios!!!!!");
+//				}
+//				else if (login.getText().equals("eu") && senha.getText().equals("123")){  // <------------- modificar para o BD
+					dialogBox.hide();
+					RootPanel.get().add(new PanelAreaRestrita(panelPrincipal));
+					setVisible(false);
+//				}
 			}
 		});
 		
@@ -264,7 +264,6 @@ public class PanelPrincipal extends Composite {
 		vPanelComponentes.add(hPanelBotoes);
 		
 		
-		// Return the dialog box
 		return dialogBox;
 	}
 	
@@ -273,18 +272,15 @@ public class PanelPrincipal extends Composite {
 		final DialogBox dialogBox = new DialogBox();
 		dialogBox.setText(titulo);
 		
-		// Create a table to layout the content
 		VerticalPanel dialogContents = new VerticalPanel();
 		dialogContents.setSpacing(6);
 		dialogBox.setWidget(dialogContents);
 		
-		// Add some text to the top of the dialog
 		HTML details = new HTML(html);
 		dialogContents.add(details);
 		dialogContents.setCellHorizontalAlignment(
 				details, HasHorizontalAlignment.ALIGN_CENTER);
 				
-		// Add a close button at the bottom of the dialog
 		Button bFechar = new Button(
 				"Voltar", new ClickHandler() {
 					public void onClick(ClickEvent event) {
@@ -295,7 +291,6 @@ public class PanelPrincipal extends Composite {
 		
 		dialogContents.add(bFechar);
 		
-		// Return the dialog box
 		return dialogBox;
 	}
 	
