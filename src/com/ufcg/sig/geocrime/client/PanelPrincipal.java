@@ -21,6 +21,7 @@ import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.PasswordTextBox;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
@@ -141,21 +142,43 @@ public class PanelPrincipal extends Composite {
 		HorizontalPanel hPanelMenu = new HorizontalPanel();
 		
 		Button bHome = new Button("Principal");
-		bHome.setWidth("300px");
+		bHome.setWidth("265px");
 				
 		Button bSobre = new Button("Sobre");
-		bSobre.setWidth("300px");
+		bSobre.setWidth("265px");
 
 		Button bEquipe = new Button("Equipe");
-		bEquipe.setWidth("300px");
+		bEquipe.setWidth("265px");
 		
-		final DialogBox dialogSobre = createDialogBox("Sobre - GeoCrime", "Este eh o projeto de <b>SIG 2011.1</b>  :D");
+		Button bLogin = new Button("Area Restrita");
+		bLogin.setWidth("265px");
+		
+		
+		
+		final DialogBox dialogSobre = criarDialogBox("Sobre - GeoCrime", "Este eh o projeto de <b>SIG 2011.1</b>  :D");
 		dialogSobre.setGlassEnabled(true);
 		dialogSobre.setAnimationEnabled(true);
 		
-		final DialogBox dialogEquipe = createDialogBox("Equipe - GeoCrime", "<br />Andre Aranha<br /> Arnett Ruffino<br /> Erickson Filipe<br /> Jonathan Brilhante<br /> Luan Barbosa<br /><br />");
+		final DialogBox dialogEquipe = criarDialogBox("Equipe - GeoCrime", "<br />Andre Aranha<br /> Arnett Ruffino<br /> Erickson Filipe<br /> Jonathan Brilhante<br /> Luan Barbosa<br /><br />");
 		dialogEquipe.setGlassEnabled(true);
 		dialogEquipe.setAnimationEnabled(true);
+
+		
+		
+		bLogin.addClickHandler(new ClickHandler() {
+			
+			@Override
+			public void onClick(ClickEvent event) {
+
+				final DialogBox dialogLogin = criarDialogLogin();
+				dialogLogin.setGlassEnabled(true);
+				dialogLogin.setAnimationEnabled(true);
+				dialogLogin.center();
+				dialogLogin.show();
+				
+			}
+		});
+		
 		bSobre.addClickHandler(new ClickHandler() {
 			
 			@Override
@@ -177,13 +200,76 @@ public class PanelPrincipal extends Composite {
 		hPanelMenu.add(bHome);
 		hPanelMenu.add(bSobre);
 		hPanelMenu.add(bEquipe);
+		hPanelMenu.add(bLogin);
 
 		
 		return hPanelMenu;
 	}
 
 
-	private DialogBox createDialogBox(String titulo, String html) {
+	private DialogBox criarDialogLogin() {
+		final DialogBox dialogBox = new DialogBox();
+		dialogBox.setText("Login - Area Restrita");
+		
+		// Create a table to layout the content
+		VerticalPanel vPanelComponentes = new VerticalPanel();
+		vPanelComponentes.setSpacing(10);
+		dialogBox.setWidget(vPanelComponentes);
+		
+		HorizontalPanel hPanelBotoes = new HorizontalPanel();
+		hPanelBotoes.setSpacing(10);
+		
+		// Add a close button at the bottom of the dialog
+		Button bCancelar = new Button(
+				"Cancelar", new ClickHandler() {
+					public void onClick(ClickEvent event) {
+						dialogBox.hide();
+						dialogBox.removeFromParent();
+					}
+				});
+		bCancelar.setWidth("100px");
+
+		
+		Label loginlb = new Label("Login:");
+		final TextBox login = new TextBox();
+		
+		Label senhalb = new Label("Senha:");
+		final PasswordTextBox senha = new PasswordTextBox();
+		
+		Button bLogar = new Button("Logar");
+		bLogar.setWidth("100px");
+		
+		bLogar.addClickHandler(new ClickHandler() {
+			
+			@Override
+			public void onClick(ClickEvent event) {
+				if (login.getText().equals("") || senha.getText().equals("")) {
+					dialogBox.setText("Ha campos vazios!!!!!");
+				}
+				else if (login.getText().equals("eu") && senha.getText().equals("123")){  // <------------- modificar para o BD
+					dialogBox.setText("Logoooooooooooooou!!!!!");
+					// abrir painel pra cadastro de viaturas e tal...
+				}
+			}
+		});
+		
+		hPanelBotoes.add(bLogar);
+		hPanelBotoes.add(bCancelar);
+		
+		
+		vPanelComponentes.add(loginlb);
+		vPanelComponentes.add(login);
+		vPanelComponentes.add(senhalb);
+		vPanelComponentes.add(senha);
+		vPanelComponentes.add(hPanelBotoes);
+		
+		
+		// Return the dialog box
+		return dialogBox;
+	}
+	
+	
+	private DialogBox criarDialogBox(String titulo, String html) {
 		final DialogBox dialogBox = new DialogBox();
 		dialogBox.setText(titulo);
 		
@@ -199,15 +285,15 @@ public class PanelPrincipal extends Composite {
 				details, HasHorizontalAlignment.ALIGN_CENTER);
 				
 		// Add a close button at the bottom of the dialog
-		Button closeButton = new Button(
+		Button bFechar = new Button(
 				"Voltar", new ClickHandler() {
 					public void onClick(ClickEvent event) {
 						dialogBox.hide();
 					}
 				});
-		closeButton.setWidth("100px");
+		bFechar.setWidth("100px");
 		
-		dialogContents.add(closeButton);
+		dialogContents.add(bFechar);
 		
 		// Return the dialog box
 		return dialogBox;
@@ -292,6 +378,7 @@ public class PanelPrincipal extends Composite {
 
 		return vPanel;
 	}
+
 	
 	public void consultarRua(String rua) {
 		Geocoder geo = new Geocoder();
