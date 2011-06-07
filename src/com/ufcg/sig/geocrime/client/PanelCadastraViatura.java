@@ -4,7 +4,9 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.maps.client.MapUIOptions;
 import com.google.gwt.maps.client.MapWidget;
+import com.google.gwt.maps.client.event.MapClickHandler;
 import com.google.gwt.maps.client.geom.LatLng;
+import com.google.gwt.maps.client.overlay.Marker;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DecoratorPanel;
@@ -22,6 +24,7 @@ public class PanelCadastraViatura extends Composite {
 	private TextBox radio;
 	private TextBox identificador;
 	private TextArea infoAdd;
+	private Marker markPosicao;
 	
 	private PanelAreaRestrita panelPai;
 	
@@ -66,6 +69,34 @@ public class PanelCadastraViatura extends Composite {
 		
 		criaConfigMapa();
 		vPanelMapa.add(mapa);
+		
+		mapa.addMapClickHandler(new MapClickHandler() {
+			
+			@Override
+			public void onClick(MapClickEvent event) {
+				
+				if (markPosicao == null) {
+					
+					
+// Personalizar Icone    <--------------
+//					
+//					Icon icon = Icon.newInstance("imgs/xx.ico");
+//					icon.setIconSize(Size.newInstance(15, 23));
+//
+//					MarkerOptions opcoes = MarkerOptions.newInstance();
+//					opcoes.setIcon(icon);
+//					markPosicao = new Marker(event.getLatLng(), opcoes);
+
+					
+					
+					markPosicao = new Marker(event.getLatLng());
+					mapa.addOverlay(markPosicao);
+				}
+				else if (event.getLatLng() != null) {
+					markPosicao.setLatLng(event.getLatLng());
+				}
+			}
+		});
 		
 		vPanelCampos.add(criaPanelCampos());
 		

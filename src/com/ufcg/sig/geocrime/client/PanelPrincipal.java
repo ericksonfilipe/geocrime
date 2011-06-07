@@ -3,6 +3,9 @@ package com.ufcg.sig.geocrime.client;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.event.dom.client.KeyPressEvent;
+import com.google.gwt.event.dom.client.KeyPressHandler;
 import com.google.gwt.maps.client.MapUIOptions;
 import com.google.gwt.maps.client.MapWidget;
 import com.google.gwt.maps.client.event.MapClickHandler;
@@ -24,6 +27,7 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.PasswordTextBox;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.TextBox;
+import com.google.gwt.user.client.ui.ToggleButton;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
 public class PanelPrincipal extends Composite {
@@ -32,7 +36,7 @@ public class PanelPrincipal extends Composite {
 	private VerticalPanel panelPrincipal;
 	private Label lbMesagens;
 	private String enderecoCrime;
-	private MapClickHandler 	clicaMapa;
+	private MapClickHandler clicaMapa;
 	
 	public PanelPrincipal() {
 		
@@ -47,26 +51,38 @@ public class PanelPrincipal extends Composite {
 		panelOpcoesEMapa.setSpacing(10);
 
 		DecoratorPanel panelMapa = new DecoratorPanel();
-		panelMapa.add(mapa);	
+		VerticalPanel vPanelMapa = new VerticalPanel();
+		
+		CheckBox mostrarBairro = new CheckBox("Mostrar Bairros");
+		mostrarBairro.setValue(true);
+		
+		vPanelMapa.add(mostrarBairro);
+		vPanelMapa.add(mapa);
+		
+		panelMapa.add(vPanelMapa);
 		
 		lbMesagens = new Label("Bem vindo ao GeoCrime!");
-		lbMesagens.setStyleName("labelAvisos");
 
 		panelOpcoesEMapa.add(criaPanelOpcao());
 		panelOpcoesEMapa.add(panelMapa);
 		
+		
+		DecoratorPanel decPanelConsulta = new DecoratorPanel();
+		decPanelConsulta.add(criaPanelConsultar());
+		
 		panelPrincipal.add(criaPanelMenu());
 		panelPrincipal.add(criaPanelAviso());
-		panelPrincipal.add(criaPanelConsultaEBairro());
+		panelPrincipal.add(decPanelConsulta);
 		panelPrincipal.add(panelOpcoesEMapa);
 		
 		initWidget(panelPrincipal);
+		
 	}
 
 	
 	private void criarEConfigurarMapa() {
 		mapa = new MapWidget(LatLng.newInstance(-7.231188, -35.886669), 13);
-		mapa.setSize("900px", "600px");
+		mapa.setSize("850px", "600px");
 		mapa.setCenter(LatLng.newInstance(-7.228633,-35.891991), 13);
 		
 		MapUIOptions options = mapa.getDefaultUI();
@@ -79,30 +95,41 @@ public class PanelPrincipal extends Composite {
 	}
 
 
-	private HorizontalPanel criaPanelConsultaEBairro() {
-		HorizontalPanel hPanelConsultaEBairro = new HorizontalPanel();
-		
-		hPanelConsultaEBairro.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_RIGHT);
-		hPanelConsultaEBairro.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
-				
-		CheckBox mostrarBairro = new CheckBox("Mostrar Bairros");
-		mostrarBairro.setValue(true);
-
-		hPanelConsultaEBairro.add(criaPanelConsultar());
-		hPanelConsultaEBairro.add(mostrarBairro);
-		return hPanelConsultaEBairro;
-	}
-
-
 	private HorizontalPanel criaPanelConsultar() {
 		
 		HorizontalPanel hPanelConsultar = new HorizontalPanel();
+		hPanelConsultar.setWidth("680px");
+		hPanelConsultar.setSpacing(7);
 		hPanelConsultar.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_RIGHT);
 		hPanelConsultar.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
 		
 		Label labelPesquisar = new Label("Pesquisar:");
 		final TextBox campoPesquisa = new TextBox();
+		campoPesquisa.setWidth("500px");
 		Button botaoPesquisar = new Button("Pesquisar");
+		
+		
+		campoPesquisa.addKeyPressHandler(new KeyPressHandler() {
+			
+			@Override
+			public void onKeyPress(KeyPressEvent event) {
+				if (event.getCharCode() == KeyCodes.KEY_ENTER) {
+					Geocoder geo = new Geocoder();
+					geo.getLatLng(campoPesquisa.getText() + " - Campina Grande - Paraiba", new LatLngCallback() {
+						
+						@Override
+						public void onSuccess(LatLng point) {
+							mapa.setCenter(point, 17);				
+						}
+						
+						@Override
+						public void onFailure() {}
+						
+					});
+				}
+			}
+		});
+		
 		
 		botaoPesquisar.addClickHandler(new ClickHandler() {
 			
@@ -142,7 +169,7 @@ public class PanelPrincipal extends Composite {
 	private HorizontalPanel criaPanelMenu() {
 		HorizontalPanel hPanelMenu = new HorizontalPanel();
 		
-		Button bHome = new Button("Principal");
+		Button bHome = new Button("Principal");              // esse botao deve recarregar o mapa e as informacoes do bd?
 		bHome.setWidth("265px");
 				
 		Button bSobre = new Button("Sobre");
@@ -242,7 +269,7 @@ public class PanelPrincipal extends Composite {
 			
 			@Override
 			public void onClick(ClickEvent event) {
-//				if (login.getText().equals("") || senha.getText().equals("")) {
+//				if (login.getText().equals("") || senha.getText().equals("")) {            // <------------ descomentar para ativar senha
 //					dialogBox.setText("Ha campos vazios!!!!!");
 //				}
 //				else if (login.getText().equals("eu") && senha.getText().equals("123")){  // <------------- modificar para o BD
@@ -302,48 +329,63 @@ public class PanelPrincipal extends Composite {
 		vPanel.setWidth("150px");
 		
 		vPanel.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_CENTER);
-		Button bCadastrar = new Button("Cadastrar Crime");
+		
+		final ToggleButton bCadastrar = new ToggleButton("Cadastrar Crime [Desabilitado]", "Cadastrar Crime [Habilitado]");
 		bCadastrar.setWidth("130px");
+		
 		
 		bCadastrar.addClickHandler(new ClickHandler() {
 			
 			@Override
 			public void onClick(ClickEvent event) {
 				
-				lbMesagens.setText("Marque no mapa onde ocorreu o crime!");
-				
-				clicaMapa = new MapClickHandler() {
+				if (bCadastrar.isDown()) {
 					
-					@Override
-					public void onClick(MapClickEvent event) {
-
-						final LatLng ponto = event.getLatLng();
-
-						Geocoder geo = new Geocoder();
+					lbMesagens.setText("-->  Marque no mapa onde ocorreu o crime!  <--");
+					
+					clicaMapa = new MapClickHandler() {
 						
-						geo.getLocations(ponto, new LocationCallback() {
+						@Override
+						public void onClick(MapClickEvent event) {
 							
-							@Override
-							public void onSuccess(JsArray<Placemark> locations) {
-								
-								enderecoCrime = locations.get(0).getAddress();
-								
-								PopupCadastrar popupCadastrar = PopupCadastrar.getInstance(enderecoCrime, ponto, mapa);
-								popupCadastrar.mostrarTela();
+							final LatLng ponto = event.getLatLng();
+							
+							Geocoder geo = new Geocoder();
+							
+							
+							if (ponto != null) {
+								geo.getLocations(ponto, new LocationCallback() {
+									
+									@Override
+									public void onSuccess(JsArray<Placemark> locations) {
+										
+										enderecoCrime = locations.get(0).getAddress();
+										
+										PopupCadastrar popupCadastrar = PopupCadastrar.getInstance(enderecoCrime, ponto, mapa);
+										popupCadastrar.mostrarTela();
+									}
+									
+									@Override
+									public void onFailure(int statusCode) {}
+									
+								});	
 							}
 							
-							@Override
-							public void onFailure(int statusCode) {}
-							
-						});	
+						}
+						
+					};
 					
-					}
-				
-				};
-				
-				mapa.addMapClickHandler(clicaMapa);
-			
+					mapa.addMapClickHandler(clicaMapa);
+					
+				}
+				else {
+					lbMesagens.setText("Bem vindo ao GeoCrimes!");
+					
+					mapa.removeMapClickHandler(clicaMapa);
+				}
+					
 			}
+				
 			
 		});
 		
@@ -351,23 +393,28 @@ public class PanelPrincipal extends Composite {
 		vPanel.add(bCadastrar);
 		
 		Button consulta1bt = new Button("Consulta 1");
-		consulta1bt.setWidth("130px");
+		consulta1bt.setWidth("142px");
+		consulta1bt.setHeight("42px");
 		vPanel.add(consulta1bt);
 		
 		Button consulta2bt = new Button("Consulta 2");
-		consulta2bt.setWidth("130px");
+		consulta2bt.setWidth("142px");
+		consulta2bt.setHeight("42px");
 		vPanel.add(consulta2bt);
 		
 		Button consulta3bt = new Button("Consulta 3");
-		consulta3bt.setWidth("130px");
+		consulta3bt.setWidth("142px");
+		consulta3bt.setHeight("42px");
 		vPanel.add(consulta3bt);
 		
 		Button consulta4bt = new Button("Consulta 4");
-		consulta4bt.setWidth("130px");
+		consulta4bt.setWidth("142px");
+		consulta4bt.setHeight("42px");
 		vPanel.add(consulta4bt);
 		
 		Button consulta5bt = new Button("Consulta 5");
-		consulta5bt.setWidth("130px");
+		consulta5bt.setWidth("142px");
+		consulta5bt.setHeight("42px");
 		vPanel.add(consulta5bt);
 		
 
