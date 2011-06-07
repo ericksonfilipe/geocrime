@@ -4,7 +4,9 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.maps.client.MapUIOptions;
 import com.google.gwt.maps.client.MapWidget;
+import com.google.gwt.maps.client.event.MapClickHandler;
 import com.google.gwt.maps.client.geom.LatLng;
+import com.google.gwt.maps.client.overlay.Marker;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DecoratorPanel;
@@ -25,6 +27,7 @@ public class PanelCadastraDelegacia extends Composite{
 	private TextBox contingente;
 	private TextBox numViaturas;
 	private TextArea infoAdd;
+	private Marker markPosicao = null;
 	
 	
 	public PanelCadastraDelegacia(PanelAreaRestrita panelPai) {
@@ -68,6 +71,21 @@ public class PanelCadastraDelegacia extends Composite{
 		
 		criaConfigMapa();
 		vPanelMapa.add(mapa);
+		
+		mapa.addMapClickHandler(new MapClickHandler() {
+			
+			@Override
+			public void onClick(MapClickEvent event) {
+				
+				if (markPosicao == null) {
+					markPosicao = new Marker(event.getLatLng());
+					mapa.addOverlay(markPosicao);
+				}
+				else if (event.getLatLng() != null) {
+					markPosicao.setLatLng(event.getLatLng());
+				}
+			}
+		});
 		
 		vPanelCampos.add(criaPanelCampos());
 		

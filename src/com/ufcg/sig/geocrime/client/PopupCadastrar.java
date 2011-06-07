@@ -2,11 +2,12 @@ package com.ufcg.sig.geocrime.client;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.maps.client.InfoWindowContent;
 import com.google.gwt.maps.client.MapWidget;
+import com.google.gwt.maps.client.event.MarkerClickHandler;
 import com.google.gwt.maps.client.geocode.Geocoder;
 import com.google.gwt.maps.client.geocode.LatLngCallback;
 import com.google.gwt.maps.client.geom.LatLng;
-import com.google.gwt.maps.client.overlay.Marker;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
@@ -25,14 +26,15 @@ public class PopupCadastrar extends PopupPanel {
 	private TextArea descricao;
 	private TextBox horario;
 	private TextBox data;
-	private TextBox local;
+	private TextBox localCrime;
 	private MapWidget mapa;
-	private Marker marcador;
-	
+	private MarkerLocalCrime marcador;
+
 	private boolean modificouLocal = false;
-	
 	private static PopupCadastrar popupInstance;
-	 
+	
+	
+	
     public static PopupCadastrar getInstance(String endereco, LatLng ponto, MapWidget mapa){
           if(popupInstance == null) {
                popupInstance = new PopupCadastrar(endereco, ponto, mapa);
@@ -44,7 +46,7 @@ public class PopupCadastrar extends PopupPanel {
 	private PopupCadastrar(String endereco, LatLng ponto, MapWidget map) {
 		super(false);
 		mapa = map;
-		marcador = new Marker(ponto);
+		marcador = new MarkerLocalCrime(ponto);
 		
 		setGlassEnabled(true);
 		setAnimationEnabled(true);
@@ -127,10 +129,10 @@ public class PopupCadastrar extends PopupPanel {
 				
 		Label localLabel = new Label("Local:");
 		
-		local = new TextBox();
-		local.setText(endereco);
-		local.setEnabled(false);
-		local.setWidth("330px");
+		localCrime = new TextBox();
+		localCrime.setText(endereco);
+		localCrime.setEnabled(false);
+		localCrime.setWidth("330px");
 		
 		Button botaoEditarLocal = new Button("Editar");
 		botaoEditarLocal.setWidth("80px");
@@ -140,13 +142,13 @@ public class PopupCadastrar extends PopupPanel {
 			
 			@Override
 			public void onClick(ClickEvent event) {
-				local.setEnabled(true);
+				localCrime.setEnabled(true);
 				modificouLocal = true;
 			}
 		});
 		
 		hPanel.add(localLabel);
-		hPanel.add(local);
+		hPanel.add(localCrime);
 		hPanel.add(botaoEditarLocal);
 		
 		return hPanel;
@@ -201,10 +203,13 @@ public class PopupCadastrar extends PopupPanel {
 			
 			@Override
 			public void onClick(ClickEvent event) {
+				
+				marcador.setDados(localCrime.getText(), tipo.getItemText(tipo.getSelectedIndex()), descricao.getText(), horario.getText(), data.getText());
+				
 				if (modificouLocal) {
 					Geocoder geo = new Geocoder();
 					
-					geo.getLatLng(local.getText(), new LatLngCallback() {
+					geo.getLatLng(localCrime.getText(), new LatLngCallback() {
 						
 						@Override
 						public void onSuccess(LatLng point) {
@@ -218,6 +223,15 @@ public class PopupCadastrar extends PopupPanel {
 				}
 				
 				mapa.addOverlay(marcador);
+				
+				marcador.addMarkerClickHandler(new MarkerClickHandler() {
+					
+					@Override
+					public void onClick(MarkerClickEvent event) {
+						mapa.getInfoWindow().open(marcador, new InfoWindowContent(marcador.getHTML()));
+					}
+				});
+				
 				
 				finalizaCadastro();
 			}
