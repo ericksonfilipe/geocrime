@@ -24,7 +24,7 @@ public class PanelCadastraViatura extends Composite {
 	private TextBox radio;
 	private TextBox identificador;
 	private TextArea infoAdd;
-	private Marker markPosicao;
+	private MarkerViatura markPosicao;
 	
 	private Label tituloLb;
 	private Label identificadorLb;
@@ -100,7 +100,7 @@ public class PanelCadastraViatura extends Composite {
 
 					
 					
-					markPosicao = new Marker(event.getLatLng());
+					markPosicao = new MarkerViatura(event.getLatLng());
 					mapa.addOverlay(markPosicao);
 				}
 				else if (event.getLatLng() != null) {
