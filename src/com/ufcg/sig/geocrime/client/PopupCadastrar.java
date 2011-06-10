@@ -11,6 +11,7 @@ import com.google.gwt.maps.client.event.MarkerClickHandler;
 import com.google.gwt.maps.client.geocode.Geocoder;
 import com.google.gwt.maps.client.geocode.LatLngCallback;
 import com.google.gwt.maps.client.geom.LatLng;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
@@ -280,10 +281,10 @@ public class PopupCadastrar extends PopupPanel {
 	private void salvarDados() {
 		
 		if (outro.isVisible()) {
-			marcador.setDados(localCrime.getText(), outro.getText(), descricao.getText(), hora.getText() +":"+ minuto.getText(), data.getValue().toString());
+			marcador.setDados(localCrime.getText(), outro.getText(), descricao.getText(), hora.getText() +":"+ minuto.getText(), data.getValue());
 		}
 		else {
-			marcador.setDados(localCrime.getText(), tipo.getItemText(tipo.getSelectedIndex()), descricao.getText(), hora.getText() +":"+ minuto.getText(), data.getValue().toString());
+			marcador.setDados(localCrime.getText(), tipo.getItemText(tipo.getSelectedIndex()), descricao.getText(), hora.getText() +":"+ minuto.getText(), data.getValue());
 		}
 		
 		
@@ -431,8 +432,10 @@ public class PopupCadastrar extends PopupPanel {
 				popupInstance = null;
 			}
 		});
-		
+	
 		vCadastrar.add(bOk);
+		double lat = marcador.getLatLng().getLatitude();
+		double longi = marcador.getLatLng().getLongitude();
 	}
 
 	

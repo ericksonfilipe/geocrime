@@ -75,10 +75,14 @@ public class PanelPrincipal extends Composite {
 		CheckBox mostrarDelegacia = new CheckBox("Delegacias");
 		mostrarDelegacia.setValue(true);
 		
+		CheckBox mostrarViaturas = new CheckBox("Viaturas");
+		mostrarViaturas.setValue(true);
+		
 		hPanelOpcoes.add(mostrarLb);
 		hPanelOpcoes.add(mostrarBairro);
 		hPanelOpcoes.add(mostrarCrimes);
 		hPanelOpcoes.add(mostrarDelegacia);
+		hPanelOpcoes.add(mostrarViaturas);
 		
 		vPanelMapa.add(hPanelOpcoes);
 		vPanelMapa.add(mapa);
@@ -98,6 +102,7 @@ public class PanelPrincipal extends Composite {
 		initWidget(panelPrincipal);
 		
 	}
+
 
 	private void criarEConfigurarMapa() {
 		mapa = new MapWidget(LatLng.newInstance(-7.231188, -35.886669), 13);
