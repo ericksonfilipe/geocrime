@@ -1,5 +1,6 @@
 package com.ufcg.sig.geocrime.client;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.maps.client.MapUIOptions;
@@ -7,6 +8,7 @@ import com.google.gwt.maps.client.MapWidget;
 import com.google.gwt.maps.client.event.MapClickHandler;
 import com.google.gwt.maps.client.geom.LatLng;
 import com.google.gwt.maps.client.overlay.Marker;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DecoratorPanel;
@@ -19,6 +21,9 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 
 public class PanelCadastraDelegacia extends Composite{
 
+	private final GeoCrimeServiceAsync greetingService = GWT
+	.create(GeoCrimeService.class);
+	
 	private PanelAreaRestrita panelPai;
 	private VerticalPanel vPrincipal;
 	private MapWidget mapa;
@@ -27,7 +32,7 @@ public class PanelCadastraDelegacia extends Composite{
 	private TextBox contingente;
 	private TextBox numViaturas;
 	private TextArea infoAdd;
-	private Marker markPosicao = null;
+	private MarkerDelegacia markPosicao = null;
 	
 	private Label erroLabel;
 	private Label unidadeLb;
@@ -90,7 +95,7 @@ public class PanelCadastraDelegacia extends Composite{
 			public void onClick(MapClickEvent event) {
 				
 				if (markPosicao == null) {
-					markPosicao = new Marker(event.getLatLng());
+					markPosicao = new MarkerDelegacia(event.getLatLng());
 					mapa.addOverlay(markPosicao);
 				}
 				else if (event.getLatLng() != null) {
@@ -325,8 +330,24 @@ public class PanelCadastraDelegacia extends Composite{
 				panelPai.criaPanelPadrao();
 			}
 		});
+		double lat = markPosicao.getLatLng().getLatitude();
+		double longi = markPosicao.getLatLng().getLongitude();
+		AsyncCallback<Void> teste = new AsyncCallback<Void>() {
+			 
+            @Override
+            public void onFailure(Throwable caught) {
+                    System.out.println(caught.getMessage());
+            }
+
+            @Override
+            public void onSuccess(Void result) {
+                  	
+            }
+
+    };
+    	//vPrincipal.add(bOk);
+		//greetingService.saveDelegacia(markPosicao.unidade,markPosicao.delegado,markPosicao.contingente,markPosicao.infoAdd,lat,longi,teste);
 		
-		vPrincipal.add(bOk);
 	}
 	
 

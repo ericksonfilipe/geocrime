@@ -1,5 +1,6 @@
 package com.ufcg.sig.geocrime.client;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.maps.client.MapUIOptions;
@@ -7,6 +8,7 @@ import com.google.gwt.maps.client.MapWidget;
 import com.google.gwt.maps.client.event.MapClickHandler;
 import com.google.gwt.maps.client.geom.LatLng;
 import com.google.gwt.maps.client.overlay.Marker;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DecoratorPanel;
@@ -19,6 +21,9 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 
 public class PanelCadastraViatura extends Composite {
 
+	private final GeoCrimeServiceAsync greetingService = GWT
+	.create(GeoCrimeService.class);
+	
 	private VerticalPanel vPrincipal;
 	private MapWidget mapa;
 	private TextBox radio;
@@ -263,6 +268,22 @@ public class PanelCadastraViatura extends Composite {
 		});
 		
 		vPrincipal.add(bOk);
+		double lat = markPosicao.getLatLng().getLatitude();
+		double longi = markPosicao.getLatLng().getLongitude();
+		AsyncCallback<Void> teste = new AsyncCallback<Void>() {
+			 
+            @Override
+            public void onFailure(Throwable caught) {
+                    System.out.println(caught.getMessage());
+            }
+
+            @Override
+            public void onSuccess(Void result) {
+                  	
+            }
+
+    };
+		greetingService.saveViatura(Integer.valueOf(markPosicao.identificador),markPosicao.idRadio,markPosicao.infoAdd,lat,longi,teste);
 	}
 	
 	

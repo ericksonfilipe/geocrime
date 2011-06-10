@@ -7,9 +7,9 @@ import com.google.gwt.user.client.ui.HTML;
 
 public class MarkerViatura extends Marker{
 
-	private String identificador;
-	private String idRadio;
-	private String infoAdd;
+	String identificador;
+	String idRadio;
+	String infoAdd;
 	
 	public MarkerViatura(LatLng point, MarkerOptions options) {
 		super(point, options);
