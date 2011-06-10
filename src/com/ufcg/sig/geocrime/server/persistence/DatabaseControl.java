@@ -42,7 +42,7 @@ public class DatabaseControl {
 	private String username = "postgres";
 	private String password = "sig";
 	private String host = "//localhost";
-	private String port = "5432";
+	private String port = "5433";
 	Connection con;
 
 	public DatabaseControl(String database, String username, String password,
