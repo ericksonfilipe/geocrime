@@ -11,13 +11,14 @@ import java.util.List;
 
 import org.postgis.PGgeometry;
 
-import sun.rmi.server.UnicastRef;
-
-import com.ufcg.sig.geocrime.server.util.Crime;
-import com.ufcg.sig.geocrime.server.util.Delegacia;
-import com.ufcg.sig.geocrime.server.util.Viatura;
+import com.ufcg.sig.geocrime.shared.Crime;
+import com.ufcg.sig.geocrime.shared.Delegacia;
+import com.ufcg.sig.geocrime.shared.Viatura;
 
 public class DatabaseControl {
+
+	private static DatabaseControl instance;
+
 	public final String driver = "org.postgresql.Driver";
 	private final String postgres = "jdbc:postgresql:";
 
@@ -42,7 +43,7 @@ public class DatabaseControl {
 	private String username = "postgres";
 	private String password = "sig";
 	private String host = "//localhost";
-	private String port = "5433";
+	private String port = "5432";
 	Connection con;
 
 	public DatabaseControl(String database, String username, String password,
@@ -62,6 +63,19 @@ public class DatabaseControl {
 		con = DriverManager
 				.getConnection(this.postgres + this.host + ":" + this.port
 						+ "/" + this.database, this.username, this.password);
+	}
+
+	public static DatabaseControl getInstance() {
+		if (instance == null) {
+			try {
+				instance = new DatabaseControl(null, null, null, null, null);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+			}
+		}
+		return instance;
 	}
 
 	public ArrayList<Crime> getCrimes(String condition) {
@@ -97,7 +111,7 @@ public class DatabaseControl {
 			double lat = Double.valueOf(ponto[0]);
 			double longi = Double.valueOf(ponto[1]);
 			
-			crimes.add(new Crime(id, tipo, descricao, horario, data, lat, longi));
+			crimes.add(new Crime(id, tipo, descricao, horario, data.getTime(), lat, longi));
 		}
 		
 		return crimes;
@@ -122,7 +136,7 @@ public class DatabaseControl {
 			double lat = Double.valueOf(ponto[0]);
 			double longi = Double.valueOf(ponto[1]);
 			
-			crimes.add(new Crime(id, tipo, descricao, horario, data, lat, longi));
+			crimes.add(new Crime(id, tipo, descricao, horario, data.getTime(), lat, longi));
 		}
 		
 		return crimes;
@@ -147,7 +161,7 @@ public class DatabaseControl {
 			double lat = Double.valueOf(ponto[0]);
 			double longi = Double.valueOf(ponto[1]);
 			
-			crimes.add(new Crime(id, tipo, descricao, horario, data, lat, longi));
+			crimes.add(new Crime(id, tipo, descricao, horario, data.getTime(), lat, longi));
 		}
 		
 		return crimes;
@@ -197,7 +211,7 @@ public class DatabaseControl {
 			double lat = Double.valueOf(ponto[0]);
 			double longi = Double.valueOf(ponto[1]);
 			
-			crimes.add(new Crime(id, tipo, descricao, horario, data, lat, longi));
+			crimes.add(new Crime(id, tipo, descricao, horario, data.getTime(), lat, longi));
 		}
 		
 		return crimes;
@@ -269,7 +283,7 @@ public class DatabaseControl {
 			double lat = Double.valueOf(ponto[0]);
 			double longi = Double.valueOf(ponto[1]);
 		
-			crime = new Crime(id, tipo, descricao, horario, data, lat, longi);
+			crime = new Crime(id, tipo, descricao, horario, data.getTime(), lat, longi);
 		}
 		
 		return crime;
@@ -331,7 +345,7 @@ public class DatabaseControl {
 		s.setString(1, c.getTipo());
 		s.setString(2, c.getDescricao());
 		s.setString(3, c.getHorario());
-		Date sql = new Date(c.getData().getTime());
+		Date sql = new Date(c.getData());
 		s.setDate(4, sql);
 		String lat = String.valueOf(c.getLat());
 		lat = lat.replace(",", ".");
@@ -391,7 +405,7 @@ public class DatabaseControl {
 			DatabaseControl c = new DatabaseControl(null, null, null, null,
 					null);
 			Date t = new Date(0);
-		//	Crime crime = new Crime(1, "assalto", "no buxo","12:30",t, 5, 5);
+			Crime crime = new Crime(1, "assalto", "no buxo","12:30",t.getTime(), 5, 5);
 			Delegacia delegacia = new Delegacia(1,"unidade da paz","neguim",30,"lol",0,1);
 			c.insertDelegacia(delegacia);
 	//		c.insertCrime(crime);
