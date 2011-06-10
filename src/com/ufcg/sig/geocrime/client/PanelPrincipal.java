@@ -1,5 +1,7 @@
 package com.ufcg.sig.geocrime.client;
 
+import java.sql.SQLException;
+
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -9,10 +11,15 @@ import com.google.gwt.event.dom.client.KeyPressHandler;
 import com.google.gwt.maps.client.MapUIOptions;
 import com.google.gwt.maps.client.MapWidget;
 import com.google.gwt.maps.client.event.MapClickHandler;
+import com.google.gwt.maps.client.geocode.DirectionQueryOptions;
+import com.google.gwt.maps.client.geocode.DirectionResults;
+import com.google.gwt.maps.client.geocode.Directions;
+import com.google.gwt.maps.client.geocode.DirectionsCallback;
 import com.google.gwt.maps.client.geocode.Geocoder;
 import com.google.gwt.maps.client.geocode.LatLngCallback;
 import com.google.gwt.maps.client.geocode.LocationCallback;
 import com.google.gwt.maps.client.geocode.Placemark;
+import com.google.gwt.maps.client.geocode.Waypoint;
 import com.google.gwt.maps.client.geom.LatLng;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
@@ -29,6 +36,7 @@ import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.ToggleButton;
 import com.google.gwt.user.client.ui.VerticalPanel;
+import com.ufcg.sig.geocrime.server.persistence.DatabaseControl;
 
 public class PanelPrincipal extends Composite {
 
@@ -38,7 +46,6 @@ public class PanelPrincipal extends Composite {
 	private String enderecoCrime;
 	private MapClickHandler clicaMapa;
 	private ToggleButton bCadastrar;
-	
 	public PanelPrincipal() {
 		
 		criarEConfigurarMapa();
@@ -92,7 +99,6 @@ public class PanelPrincipal extends Composite {
 		
 	}
 
-	
 	private void criarEConfigurarMapa() {
 		mapa = new MapWidget(LatLng.newInstance(-7.231188, -35.886669), 13);
 		mapa.setSize("850px", "600px");
@@ -410,6 +416,46 @@ public class PanelPrincipal extends Composite {
 		Button consulta1bt = new Button("Consulta 1");
 		consulta1bt.setWidth("142px");
 		consulta1bt.setHeight("42px");
+		consulta1bt.addClickHandler(new ClickHandler() {
+			
+			@Override
+			public void onClick(ClickEvent event) {
+				mapa.addMapClickHandler(new MapClickHandler() {
+					
+					private Waypoint[] pontosDaRota = new Waypoint[2];
+					private int contador = 0;
+
+					@Override
+					public void onClick(MapClickEvent event) {
+						pontosDaRota[contador ] = new Waypoint(event.getLatLng());
+						if (contador == 1) {
+							DirectionQueryOptions dqo = new DirectionQueryOptions(mapa);
+							dqo.setRetrievePolyline(true);
+							Directions.loadFromWaypoints(pontosDaRota, dqo, new DirectionsCallback() {
+								
+								@Override
+								public void onSuccess(DirectionResults result) {
+									mapa.addOverlay(result.getPolyline());
+									
+								}
+								
+								@Override
+								public void onFailure(int statusCode) {
+									// TODO Auto-generated method stub
+									
+								}
+							});
+							pontosDaRota = new Waypoint[2];
+							contador = 0;
+						}
+						contador++;
+						
+					}
+				});
+				
+			}
+		});
+
 		vPanel.add(consulta1bt);
 		
 		Button consulta2bt = new Button("Consulta 2");
