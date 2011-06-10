@@ -8,8 +8,8 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
  * The async counterpart of <code>GreetingService</code>.
  */
 public interface GeoCrimeServiceAsync {
-	
-	void greetServer(String input, AsyncCallback<String> callback,
-			AsyncCallback<Void> callback2);
+
+	void saveCrime(String tipo, String descricao, String horario, Date data,
+			double lat, double longi, AsyncCallback<Void> asyncCallback);
 
 }

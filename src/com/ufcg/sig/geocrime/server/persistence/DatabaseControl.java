@@ -324,13 +324,14 @@ public class DatabaseControl {
 	
 
 	public void insertCrime(Crime c) throws SQLException {
-
+		System.out.println("AQUI");
 		PreparedStatement s = con
 				.prepareStatement(DatabaseControl.INSERT_CRIME);
+		System.out.println("AQUI");
 		s.setString(1, c.getTipo());
 		s.setString(2, c.getDescricao());
 		s.setString(3, c.getHorario());
-		Date sql = Date.valueOf(c.getData().toString());
+		Date sql = new Date(c.getData().getTime());
 		s.setDate(4, sql);
 		String lat = String.valueOf(c.getLat());
 		lat = lat.replace(",", ".");
@@ -340,6 +341,7 @@ public class DatabaseControl {
 		s.setString(5, ponto);
 		s.execute();
 		s.close();
+		System.out.println("AQUI");
 
 	}
 
