@@ -8,5 +8,6 @@
 	<classpathentry kind="lib" path="lib/maps.jar"/>
 	<classpathentry kind="lib" path="lib/postgresql-9.0-801.jdbc4.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/postgresql-9.0-801.jdbc4.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/postgis-2.0.0SVN.jar"/>
 	<classpathentry kind="output" path="war/WEB-INF/classes"/>
 </classpath>

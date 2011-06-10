@@ -1,5 +1,7 @@
 package com.ufcg.sig.geocrime.client;
 
+import java.sql.SQLException;
+
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -29,6 +31,7 @@ import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.ToggleButton;
 import com.google.gwt.user.client.ui.VerticalPanel;
+import com.ufcg.sig.geocrime.server.persistence.DatabaseControl;
 
 public class PanelPrincipal extends Composite {
 
@@ -37,11 +40,19 @@ public class PanelPrincipal extends Composite {
 	private Label lbMesagens;
 	private String enderecoCrime;
 	private MapClickHandler clicaMapa;
-	
+	private static DatabaseControl c;
 	public PanelPrincipal() {
 		
 		criarEConfigurarMapa();
-		
+		try {
+			c = new DatabaseControl(null,null,null,null,null);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		panelPrincipal = new VerticalPanel();
 		panelPrincipal.setSpacing(10);
 		panelPrincipal.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_CENTER);
@@ -79,6 +90,9 @@ public class PanelPrincipal extends Composite {
 		
 	}
 
+	public static DatabaseControl getDB(){
+		return c;
+	}
 	
 	private void criarEConfigurarMapa() {
 		mapa = new MapWidget(LatLng.newInstance(-7.231188, -35.886669), 13);
