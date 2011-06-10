@@ -11,10 +11,15 @@ import com.google.gwt.event.dom.client.KeyPressHandler;
 import com.google.gwt.maps.client.MapUIOptions;
 import com.google.gwt.maps.client.MapWidget;
 import com.google.gwt.maps.client.event.MapClickHandler;
+import com.google.gwt.maps.client.geocode.DirectionQueryOptions;
+import com.google.gwt.maps.client.geocode.DirectionResults;
+import com.google.gwt.maps.client.geocode.Directions;
+import com.google.gwt.maps.client.geocode.DirectionsCallback;
 import com.google.gwt.maps.client.geocode.Geocoder;
 import com.google.gwt.maps.client.geocode.LatLngCallback;
 import com.google.gwt.maps.client.geocode.LocationCallback;
 import com.google.gwt.maps.client.geocode.Placemark;
+import com.google.gwt.maps.client.geocode.Waypoint;
 import com.google.gwt.maps.client.geom.LatLng;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
@@ -40,7 +45,7 @@ public class PanelPrincipal extends Composite {
 	private Label lbMesagens;
 	private String enderecoCrime;
 	private MapClickHandler clicaMapa;
-	private static DatabaseControl c;
+	private ToggleButton bCadastrar;
 	public PanelPrincipal() {
 		
 		criarEConfigurarMapa();
@@ -77,13 +82,9 @@ public class PanelPrincipal extends Composite {
 		panelOpcoesEMapa.add(criaPanelOpcao());
 		panelOpcoesEMapa.add(panelMapa);
 		
-		
-		DecoratorPanel decPanelConsulta = new DecoratorPanel();
-		decPanelConsulta.add(criaPanelConsultar());
-		
 		panelPrincipal.add(criaPanelMenu());
 		panelPrincipal.add(criaPanelAviso());
-		panelPrincipal.add(decPanelConsulta);
+		panelPrincipal.add(criaPanelConsultar());
 		panelPrincipal.add(panelOpcoesEMapa);
 		
 		initWidget(panelPrincipal);
@@ -104,7 +105,7 @@ public class PanelPrincipal extends Composite {
 		options.setDoubleClick(false);
 		options.setLargeMapControl3d(true);
 		mapa.setUI(options);
-		mapa.setDoubleClickZoom(false);
+		mapa.setDoubleClickZoom(true);
 		mapa.setDraggable(true);
 	}
 
@@ -344,7 +345,7 @@ public class PanelPrincipal extends Composite {
 		
 		vPanel.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_CENTER);
 		
-		final ToggleButton bCadastrar = new ToggleButton("Cadastrar Crime [Desabilitado]", "Cadastrar Crime [Habilitado]");
+		bCadastrar = new ToggleButton("Cadastrar Crime [Desabilitado]", "Cadastrar Crime [Habilitado]");
 		bCadastrar.setWidth("130px");
 		
 		
@@ -355,6 +356,7 @@ public class PanelPrincipal extends Composite {
 				
 				if (bCadastrar.isDown()) {
 					
+					mapa.setDoubleClickZoom(false);
 					lbMesagens.setText("-->  Marque no mapa onde ocorreu o crime!  <--");
 					
 					clicaMapa = new MapClickHandler() {
@@ -395,6 +397,7 @@ public class PanelPrincipal extends Composite {
 				else {
 					lbMesagens.setText("Bem vindo ao GeoCrimes!");
 					
+					mapa.setDoubleClickZoom(true);
 					mapa.removeMapClickHandler(clicaMapa);
 				}
 					
@@ -409,6 +412,46 @@ public class PanelPrincipal extends Composite {
 		Button consulta1bt = new Button("Consulta 1");
 		consulta1bt.setWidth("142px");
 		consulta1bt.setHeight("42px");
+		consulta1bt.addClickHandler(new ClickHandler() {
+			
+			@Override
+			public void onClick(ClickEvent event) {
+				mapa.addMapClickHandler(new MapClickHandler() {
+					
+					private Waypoint[] pontosDaRota = new Waypoint[2];
+					private int contador = 0;
+
+					@Override
+					public void onClick(MapClickEvent event) {
+						pontosDaRota[contador ] = new Waypoint(event.getLatLng());
+						if (contador == 1) {
+							DirectionQueryOptions dqo = new DirectionQueryOptions(mapa);
+							dqo.setRetrievePolyline(true);
+							Directions.loadFromWaypoints(pontosDaRota, dqo, new DirectionsCallback() {
+								
+								@Override
+								public void onSuccess(DirectionResults result) {
+									mapa.addOverlay(result.getPolyline());
+									
+								}
+								
+								@Override
+								public void onFailure(int statusCode) {
+									// TODO Auto-generated method stub
+									
+								}
+							});
+							pontosDaRota = new Waypoint[2];
+							contador = 0;
+						}
+						contador++;
+						
+					}
+				});
+				
+			}
+		});
+
 		vPanel.add(consulta1bt);
 		
 		Button consulta2bt = new Button("Consulta 2");
