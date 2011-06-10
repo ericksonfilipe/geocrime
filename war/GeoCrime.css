@@ -83,3 +83,20 @@ h1 {
 	margin-bottom: 5px;
 }
 
+.erroCadastro {
+	color: red;	
+}
+
+.campoErro {
+	color: red;	
+}
+
+.panelHorario {
+	border: 1px solid black; 
+	margin-bottom: 20px;
+}
+
+.mapaErro {
+	border: 1px solid red; 
+	margin-bottom: 20px;
+}
