@@ -1,5 +1,8 @@
 package com.ufcg.sig.geocrime.client;
 
+
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.maps.client.InfoWindowContent;
@@ -18,17 +21,28 @@ import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
+import com.google.gwt.user.datepicker.client.DateBox;
 
 public class PopupCadastrar extends PopupPanel {
 	
 	private VerticalPanel vCadastrar;
 	private ListBox tipo;
+	private TextBox outro;
 	private TextArea descricao;
-	private TextBox horario;
-	private TextBox data;
+	private TextBox hora;
+	private TextBox minuto;
+	private DateBox data;
 	private TextBox localCrime;
 	private MapWidget mapa;
 	private MarkerLocalCrime marcador;
+	
+	
+	private Label labelErro;
+	private Label outroLabel;
+	private Label tipoLabel;
+	private Label descricaoLabel;
+	private Label horarioLabel;
+	private Label dataLabel;
 
 	private boolean modificouLocal = false;
 	private static PopupCadastrar popupInstance;
@@ -60,10 +74,15 @@ public class PopupCadastrar extends PopupPanel {
 		Label tituloPopup = new Label("Cadastro de Crime");
 		tituloPopup.setStyleName("tituloCadastro");
 		
+		labelErro = new Label();
+		labelErro.setStyleName("erroCadastro");
+		labelErro.setVisible(false);
+		
 		VerticalPanel paneTitulo = new VerticalPanel();
 		paneTitulo.setWidth("500px");
 		paneTitulo.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_CENTER);
 		paneTitulo.add(tituloPopup);
+		paneTitulo.add(labelErro);
 		
 		vCadastrar.add(paneTitulo);
 	    vCadastrar.add(criaPanelLocal(endereco));
@@ -71,16 +90,22 @@ public class PopupCadastrar extends PopupPanel {
 	    vCadastrar.add(criaPanelBotoes());
 	}
 	
+	
 	private VerticalPanel criaCorpoPopup() {
 		
 		VerticalPanel vPanelCampos = new VerticalPanel();
 		vPanelCampos.setSpacing(7);
 		vPanelCampos.setWidth("490px");
 		
-		Label tipoLabel = new Label("Tipo:");
+		outroLabel = new Label("Outro:");
+		outro = new TextBox();
+		outro.setWidth("395px");
+		outroLabel.setVisible(false);
+		outro.setVisible(false);
+
+		tipoLabel = new Label("Tipo:");
 		tipo = new ListBox(false);
 
-	    
 	    tipo.addItem("Assalto");
 	    tipo.addItem("Atropelamento");
 	    tipo.addItem("Furto");
@@ -88,28 +113,66 @@ public class PopupCadastrar extends PopupPanel {
 	    tipo.addItem("Roubo de Veiculo");
 	    tipo.addItem("Uso/Venda de Drogas");
 	    tipo.addItem("Vandalismo");
-	    tipo.addItem("Outro");
+	    tipo.addItem("Outro...");
 
+	    
+	    tipo.addChangeHandler(new ChangeHandler() {
+			
+			@Override
+			public void onChange(ChangeEvent event) {
+				
+				if (tipo.getItemText(tipo.getSelectedIndex()).equals("Outro...")) {
+					outro.setVisible(true);
+					outroLabel.setVisible(true);
+				}
+				else {
+					outro.setVisible(false);
+					outroLabel.setVisible(false);
+				}
+				
+			}
+		});
+	    
 	    tipo.setVisibleItemCount(1);
 		tipo.setWidth("400px");
 		
-		Label descricaoLabel = new Label("Descricao:");
+		descricaoLabel = new Label("Descricao:");
 		descricao = new TextArea();
 		descricao.setWidth("395px");
 		descricao.setHeight("100px");
 		
-		Label horarioLabel = new Label("Horario:");
-	    horario = new TextBox();
+		horarioLabel = new Label("Horario: (use apenas numeros)");
+		
+		
+		HorizontalPanel hPanelHorario = new HorizontalPanel();
+		hPanelHorario.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
+		hPanelHorario.setStyleName("panelHorario");
+		hPanelHorario.setSpacing(7);
+		Label horaLabel = new Label("Hora: ");
+		hora = new TextBox();
+		hora.setWidth("50px");
+		Label minutoLabel = new Label("Minuto: ");
+	    minuto = new TextBox();
+	    minuto.setWidth("50px");
 	    
-	    Label dataLabel = new Label("Data:");
-	    data = new TextBox();
+	    hPanelHorario.add(horaLabel);
+	    hPanelHorario.add(hora);
+	    hPanelHorario.add(minutoLabel);
+	    hPanelHorario.add(minuto);
+	    
+	    
+	    
+	    dataLabel = new Label("Data:");
+	    data = new DateBox();
 		
 	    vPanelCampos.add(tipoLabel);
 	    vPanelCampos.add(tipo);
+	    vPanelCampos.add(outroLabel);
+	    vPanelCampos.add(outro);
 	    vPanelCampos.add(descricaoLabel);
 	    vPanelCampos.add(descricao);
 	    vPanelCampos.add(horarioLabel);
-	    vPanelCampos.add(horario);
+	    vPanelCampos.add(hPanelHorario);
 	    vPanelCampos.add(dataLabel);
 	    vPanelCampos.add(data);
 	    
@@ -117,8 +180,7 @@ public class PopupCadastrar extends PopupPanel {
 		return vPanelCampos;
 	}
 
-
-
+	
 	private HorizontalPanel criaPanelLocal(String endereco) {
 		
 		HorizontalPanel hPanel = new HorizontalPanel();
@@ -192,10 +254,10 @@ public class PopupCadastrar extends PopupPanel {
 			
 			@Override
 			public void onClick(ClickEvent event) {
-				 tipo.setItemSelected(0, true);
 				 descricao.setText("");
-				 horario.setText("");
-				 data.setText("");
+				 hora.setText("");
+				 minuto.setText("");
+				 outro.setText("");
 			}
 		});
 	    
@@ -204,41 +266,144 @@ public class PopupCadastrar extends PopupPanel {
 			@Override
 			public void onClick(ClickEvent event) {
 				
-				marcador.setDados(localCrime.getText(), tipo.getItemText(tipo.getSelectedIndex()), descricao.getText(), horario.getText(), data.getText());
-				
-				if (modificouLocal) {
-					Geocoder geo = new Geocoder();
-					
-					geo.getLatLng(localCrime.getText(), new LatLngCallback() {
-						
-						@Override
-						public void onSuccess(LatLng point) {
-							marcador.setLatLng(point);
-						}
-						
-						@Override
-						public void onFailure() {}
-					});
-					
+				if (validaDados()) {
+					salvarDados();
 				}
-				
-				mapa.addOverlay(marcador);
-				
-				marcador.addMarkerClickHandler(new MarkerClickHandler() {
-					
-					@Override
-					public void onClick(MarkerClickEvent event) {
-						mapa.getInfoWindow().open(marcador, new InfoWindowContent(marcador.getHTML()));
-					}
-				});
-				
-				
-				finalizaCadastro();
 			}
+
 		});
 	    
 		return hPanelBotoes;
 	}
+
+	
+	private void salvarDados() {
+		
+		if (outro.isVisible()) {
+			marcador.setDados(localCrime.getText(), outro.getText(), descricao.getText(), hora.getText() +":"+ minuto.getText(), data.getValue().toString());
+		}
+		else {
+			marcador.setDados(localCrime.getText(), tipo.getItemText(tipo.getSelectedIndex()), descricao.getText(), hora.getText() +":"+ minuto.getText(), data.getValue().toString());
+		}
+		
+		
+		if (modificouLocal) {
+			Geocoder geo = new Geocoder();
+			
+			geo.getLatLng(localCrime.getText(), new LatLngCallback() {
+				
+				@Override
+				public void onSuccess(LatLng point) {
+					marcador.setLatLng(point);
+				}
+				
+				@Override
+				public void onFailure() {}
+			});
+			
+		}
+		
+		mapa.addOverlay(marcador);
+		
+		marcador.addMarkerClickHandler(new MarkerClickHandler() {
+			
+			@Override
+			public void onClick(MarkerClickEvent event) {
+				mapa.getInfoWindow().open(marcador, new InfoWindowContent(marcador.getHTML()));
+			}
+		});
+		
+		
+		finalizaCadastro();
+
+	}
+	
+	
+	private boolean validaDados() {
+		boolean valido = true;
+		
+		String outroStr = outro.getText().trim();
+		String descricaoStr = descricao.getText().trim();
+		String horaStr = hora.getText().trim();
+		String minutoStr = minuto.getText().trim();
+			
+		
+		if (outro.isVisible() && outroStr.equals("") || descricaoStr.equals("") 
+		    || horaStr.equals("") || !somenteNumeros(horaStr) || !somenteNumeros(minutoStr) || data.getValue() == null) {
+
+			valido = false;
+			labelErro.setVisible(true);
+			
+			if (outro.isVisible() && outroStr.equals(""))
+				outroLabel.setStyleName("campoErro");
+			else
+				outroLabel.removeStyleName("campoErro");
+			
+			if (descricaoStr.equals(""))
+				descricaoLabel.setStyleName("campoErro");
+			else 
+				descricaoLabel.removeStyleName("campoErro");
+
+			if (horaStr.equals("") || !somenteNumeros(horaStr) || !somenteNumeros(minutoStr))
+				horarioLabel.setStyleName("campoErro");
+			else if (somenteNumeros(horaStr))
+				horarioLabel.removeStyleName("campoErro");
+			
+			
+			if (data.getValue() == null)
+				dataLabel.setStyleName("campoErro");
+			else
+				dataLabel.removeStyleName("campoErro");
+
+		}	
+		
+		if (somenteNumeros(horaStr) && somenteNumeros(minutoStr)) {
+
+			if (!horarioValido(hora.getText().trim(), minuto.getText().trim())) {
+				valido = false;
+				
+				horarioLabel.setStyleName("campoErro");
+			}
+		}
+
+		if (!valido) {
+			labelErro.setText("Ha campos Incorretos");
+			labelErro.setVisible(true);
+		}
+		return valido;
+	}
+	
+	
+	private boolean somenteNumeros(String dado) {
+		for( int i = 0; i < dado.length(); i++ )  {
+            if( Character.isDigit( dado.charAt( i ) ) == false) {
+            	return false;
+            }
+		}
+
+		return true;
+	}
+	
+	
+	private boolean horarioValido(String hora, String minuto) {
+		
+		Integer horaCrime;
+		Integer minutoCrime;
+		
+		if (hora.equals("") || minuto.equals("")) {
+			return false;
+		}
+		
+		horaCrime = Integer.parseInt(hora);
+		minutoCrime = Integer.parseInt(minuto);
+		
+		if (( horaCrime >= 0 & horaCrime <= 23 ) && ( minutoCrime >= 0 & minutoCrime <= 59)) {
+			return true;
+		}
+		
+		return false;
+	}
+	
 	
 	private void finalizaCadastro() {
 		vCadastrar.clear();
@@ -270,6 +435,7 @@ public class PopupCadastrar extends PopupPanel {
 		vCadastrar.add(bOk);
 	}
 
+	
 	public void mostrarTela() {
 		center();
 		show();

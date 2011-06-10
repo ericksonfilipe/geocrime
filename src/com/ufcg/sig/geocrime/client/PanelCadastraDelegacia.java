@@ -29,6 +29,13 @@ public class PanelCadastraDelegacia extends Composite{
 	private TextArea infoAdd;
 	private Marker markPosicao = null;
 	
+	private Label erroLabel;
+	private Label unidadeLb;
+	private Label delegadoLb; 
+	private Label contingenteLb;
+	private Label numViaturasLb;
+	private Label infoAddLb;
+
 	
 	public PanelCadastraDelegacia(PanelAreaRestrita panelPai) {
 		this.panelPai = panelPai;
@@ -54,10 +61,15 @@ public class PanelCadastraDelegacia extends Composite{
 		
 		Label tituloLb = new Label("Cadastrar Delegacia");
 		tituloLb.setStyleName("tituloCadastro");
+		
+		erroLabel = new Label();
+		erroLabel.setVisible(false);
+		
 		VerticalPanel vPanelTitulo = new VerticalPanel();
 		vPanelTitulo.setWidth("800px");
 		vPanelTitulo.setHorizontalAlignment(HorizontalPanel.ALIGN_CENTER);
 		vPanelTitulo.add(tituloLb);
+		vPanelTitulo.add(erroLabel);
 		
 		VerticalPanel vPanelCampos = new VerticalPanel();
 		vPanelCampos.setSpacing(5);
@@ -107,19 +119,19 @@ public class PanelCadastraDelegacia extends Composite{
 		VerticalPanel vPanel = new VerticalPanel();
 		vPanel.setSpacing(10);
 		
-		Label unidadeLb = new Label("Unidade: (ex.: 12DP)");
+		unidadeLb = new Label("Unidade: (ex.: 12DP)");
 		unidade = new TextBox();
 		
-		Label delegadoLb = new Label("Delegado:");
+		delegadoLb = new Label("Delegado:");
 		delegado = new TextBox();
 		
-		Label contingenteLb = new Label("Contingente:");
+		contingenteLb = new Label("Contingente:");
 		contingente = new TextBox();
 		
-		Label numViaturasLb = new Label("Numero de Viaturas:");
+		numViaturasLb = new Label("Numero de Viaturas:");
 		numViaturas = new TextBox();
 		
-		Label infoAddLb = new Label("Informacoes Adicionais:");
+		infoAddLb = new Label("Informacoes Adicionais:");
 		infoAdd = new TextArea();
 		infoAdd.setWidth("100%");
 		infoAdd.setHeight("50px");
@@ -160,7 +172,8 @@ public class PanelCadastraDelegacia extends Composite{
 			
 			@Override
 			public void onClick(ClickEvent event) {
-				finalizarCadastro();
+				if (validaDados())
+					finalizarCadastro();
 			}
 		});
 		
@@ -187,6 +200,104 @@ public class PanelCadastraDelegacia extends Composite{
 		
 		return hPanel;
 	}
+	
+	
+	private boolean validaDados() {
+		boolean valido = true;
+		
+		String unidadeStr = unidade.getText().trim();
+		String delegadoStr = delegado.getText().trim();
+		String contingenteStr = contingente.getText().trim();
+		String numViaturasStr = numViaturas.getText().trim();
+		
+		if (unidadeStr.equals("") 
+			|| delegadoStr.equals("") 
+			|| contingenteStr.equals("") 
+			|| !somenteNumeros(contingenteStr) 
+			|| numViaturasStr.equals("")
+			|| !somenteNumeros(numViaturasStr)
+			|| markPosicao == null) {
+
+			erroLabel.setText("Ha campos Incorretos");
+			erroLabel.setVisible(true);
+			valido = false;
+			
+			if (unidadeStr.equals(""))
+				unidadeLb.setStyleName("campoErro");
+			else
+				unidadeLb.removeStyleName("campoErro");
+			
+			if (delegadoStr.equals(""))
+				delegadoLb.setStyleName("campoErro");
+			else 
+				delegadoLb.removeStyleName("campoErro");
+			
+			if (contingenteStr.equals("") || !somenteNumeros(contingenteStr))
+				contingenteLb.setStyleName("campoErro");
+			else
+				contingenteLb.removeStyleName("campoErro");
+			
+			if (numViaturasStr.equals("") || !somenteNumeros(numViaturasStr))
+				numViaturasLb.setStyleName("campoErro");
+			else
+				numViaturasLb.removeStyleName("campoErro");
+			
+			if (markPosicao == null)
+				mapa.setStyleName("mapaErro");
+			else
+				mapa.removeStyleName("mapaErro");
+			
+			
+		}
+		
+		if (somenteNumeros(numViaturasStr)) {
+			if (!numerosValidos(numViaturasStr)) {
+				valido = false;
+				
+				numViaturasLb.setStyleName("campoErro");
+			}
+		}
+		
+		if (somenteNumeros(contingenteStr)) {
+			if (!numerosValidos(contingenteStr)) {
+				valido = false;
+				
+				contingenteLb.setStyleName("campoErro");
+			}
+		}
+		
+		
+		
+		return valido;
+	}
+	
+	private boolean somenteNumeros(String dado) {
+		for( int i = 0; i < dado.length(); i++ )  {
+            if( Character.isDigit( dado.charAt( i ) ) == false) {
+            	return false;
+            }
+		}
+
+		return true;
+	}
+	
+	private boolean numerosValidos(String umNumero) {
+		
+		Integer numero;
+		
+		if (umNumero.equals("")) {
+			return false;
+		}
+		
+		numero = Integer.parseInt(umNumero);
+		
+		if ( numero >= 0) {
+			return true;
+		}
+		
+		return false;
+	}
+	
 	
 	private void finalizarCadastro() {
 		vPrincipal.clear();

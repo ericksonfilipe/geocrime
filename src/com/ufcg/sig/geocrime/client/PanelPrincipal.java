@@ -37,6 +37,7 @@ public class PanelPrincipal extends Composite {
 	private Label lbMesagens;
 	private String enderecoCrime;
 	private MapClickHandler clicaMapa;
+	private ToggleButton bCadastrar;
 	
 	public PanelPrincipal() {
 		
@@ -66,13 +67,9 @@ public class PanelPrincipal extends Composite {
 		panelOpcoesEMapa.add(criaPanelOpcao());
 		panelOpcoesEMapa.add(panelMapa);
 		
-		
-		DecoratorPanel decPanelConsulta = new DecoratorPanel();
-		decPanelConsulta.add(criaPanelConsultar());
-		
 		panelPrincipal.add(criaPanelMenu());
 		panelPrincipal.add(criaPanelAviso());
-		panelPrincipal.add(decPanelConsulta);
+		panelPrincipal.add(criaPanelConsultar());
 		panelPrincipal.add(panelOpcoesEMapa);
 		
 		initWidget(panelPrincipal);
@@ -90,7 +87,7 @@ public class PanelPrincipal extends Composite {
 		options.setDoubleClick(false);
 		options.setLargeMapControl3d(true);
 		mapa.setUI(options);
-		mapa.setDoubleClickZoom(false);
+		mapa.setDoubleClickZoom(true);
 		mapa.setDraggable(true);
 	}
 
@@ -330,7 +327,7 @@ public class PanelPrincipal extends Composite {
 		
 		vPanel.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_CENTER);
 		
-		final ToggleButton bCadastrar = new ToggleButton("Cadastrar Crime [Desabilitado]", "Cadastrar Crime [Habilitado]");
+		bCadastrar = new ToggleButton("Cadastrar Crime [Desabilitado]", "Cadastrar Crime [Habilitado]");
 		bCadastrar.setWidth("130px");
 		
 		
@@ -341,6 +338,7 @@ public class PanelPrincipal extends Composite {
 				
 				if (bCadastrar.isDown()) {
 					
+					mapa.setDoubleClickZoom(false);
 					lbMesagens.setText("-->  Marque no mapa onde ocorreu o crime!  <--");
 					
 					clicaMapa = new MapClickHandler() {
@@ -381,6 +379,7 @@ public class PanelPrincipal extends Composite {
 				else {
 					lbMesagens.setText("Bem vindo ao GeoCrimes!");
 					
+					mapa.setDoubleClickZoom(true);
 					mapa.removeMapClickHandler(clicaMapa);
 				}
 					
