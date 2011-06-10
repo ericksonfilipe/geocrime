@@ -49,15 +49,6 @@ public class PanelPrincipal extends Composite {
 	public PanelPrincipal() {
 		
 		criarEConfigurarMapa();
-		try {
-			c = new DatabaseControl(null,null,null,null,null);
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 		panelPrincipal = new VerticalPanel();
 		panelPrincipal.setSpacing(10);
 		panelPrincipal.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_CENTER);
@@ -91,10 +82,7 @@ public class PanelPrincipal extends Composite {
 		
 	}
 
-	public static DatabaseControl getDB(){
-		return c;
-	}
-	
+
 	private void criarEConfigurarMapa() {
 		mapa = new MapWidget(LatLng.newInstance(-7.231188, -35.886669), 13);
 		mapa.setSize("850px", "600px");
