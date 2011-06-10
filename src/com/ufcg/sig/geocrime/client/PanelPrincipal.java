@@ -54,10 +54,26 @@ public class PanelPrincipal extends Composite {
 		DecoratorPanel panelMapa = new DecoratorPanel();
 		VerticalPanel vPanelMapa = new VerticalPanel();
 		
-		CheckBox mostrarBairro = new CheckBox("Mostrar Bairros");
+		HorizontalPanel hPanelOpcoes = new HorizontalPanel();
+		hPanelOpcoes.setSpacing(5);
+		hPanelOpcoes.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);;
+		
+		Label mostrarLb = new Label("Mostrar: ");
+		CheckBox mostrarBairro = new CheckBox("Bairros");
 		mostrarBairro.setValue(true);
 		
-		vPanelMapa.add(mostrarBairro);
+		CheckBox mostrarCrimes = new CheckBox("Crimes");
+		mostrarCrimes.setValue(true);
+		
+		CheckBox mostrarDelegacia = new CheckBox("Delegacias");
+		mostrarDelegacia.setValue(true);
+		
+		hPanelOpcoes.add(mostrarLb);
+		hPanelOpcoes.add(mostrarBairro);
+		hPanelOpcoes.add(mostrarCrimes);
+		hPanelOpcoes.add(mostrarDelegacia);
+		
+		vPanelMapa.add(hPanelOpcoes);
 		vPanelMapa.add(mapa);
 		
 		panelMapa.add(vPanelMapa);
