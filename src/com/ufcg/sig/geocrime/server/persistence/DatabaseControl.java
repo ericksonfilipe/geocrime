@@ -1,6 +1,7 @@
 package com.ufcg.sig.geocrime.server.persistence;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -18,7 +19,7 @@ public class DatabaseControl {
 	public final String driver = "org.postgresql.Driver";
 	private final String postgres = "jdbc:postgresql:";
 
-	public static final String INSERT_CRIME = "INSERT INTO Crime(tipo,descricao,horario ,the_geom) VALUES (?,?,?,ST_GeomFromText(?, 29195));";
+	public static final String INSERT_CRIME = "INSERT INTO Crime(tipo,descricao,horario,data,the_geom) VALUES (?,?,?,?,ST_GeomFromText(?, 29195));";
 	public static final String SELECT_CRIME = "SELECT * FROM Crime WHERE id = ?";
 	public static final String SELECT_ALLCRIME = "SELECT * FROM Crime";
 	public static final String INSERT_DELEGACIA = "INSERT INTO Delegacia(unidade,delegado,contingente,infoAdicionais,the_geom) VALUES (?,?,?,?,ST_GeomFromText(?,29195));";
@@ -42,6 +43,7 @@ public class DatabaseControl {
 			this.host = host;
 		if (port != null)
 			this.port = port;
+		Class.forName(driver);
 		con = DriverManager
 				.getConnection(this.postgres + this.host + ":" + this.port
 						+ "/" + this.database, this.username, this.password);
@@ -77,23 +79,23 @@ public class DatabaseControl {
 		}
 	}
 
-	public Crime selectCrime(int id) throws SQLException {
-		PreparedStatement s = con
-				.prepareStatement(DatabaseControl.INSERT_CRIME);
-		s.setInt(1, id);
-		ResultSet rs = s.executeQuery();
-		String tipo = (String) rs.getObject("tipo");
-		String descricao = (String) rs.getObject("descricao");
-		Timestamp horario = (Timestamp) rs.getObject("horario");
-		PGgeometry the_geom = (PGgeometry) rs.getObject("the_geom");
-		String point = the_geom.getGeometry().getValue();
-		point = point.replace("(", "");
-		point = point.replace(")", "");
-		String[] ponto = point.split(" ");
-		double lat = Double.valueOf(ponto[0]);
-		double longi = Double.valueOf(ponto[1]);
-		return new Crime(id, tipo, descricao, horario, lat, longi);
-	}
+//	public Crime selectCrime(int id) throws SQLException {
+//		PreparedStatement s = con
+//				.prepareStatement(DatabaseControl.INSERT_CRIME);
+//		s.setInt(1, id);
+//		ResultSet rs = s.executeQuery();
+//		String tipo = (String) rs.getObject("tipo");
+//		String descricao = (String) rs.getObject("descricao");
+//		Timestamp horario = (Timestamp) rs.getObject("horario");
+//		PGgeometry the_geom = (PGgeometry) rs.getObject("the_geom");
+//		String point = the_geom.getGeometry().getValue();
+//		point = point.replace("(", "");
+//		point = point.replace(")", "");
+//		String[] ponto = point.split(" ");
+//		double lat = Double.valueOf(ponto[0]);
+//		double longi = Double.valueOf(ponto[1]);
+//		return new Crime(id, tipo, descricao, horario, lat, longi);
+//	}
 
 	public void insertCrime(Crime c) throws SQLException {
 
@@ -101,13 +103,15 @@ public class DatabaseControl {
 				.prepareStatement(DatabaseControl.INSERT_CRIME);
 		s.setString(1, c.getTipo());
 		s.setString(2, c.getDescricao());
-		s.setTimestamp(3, c.getHorario());
+		s.setString(3, c.getHorario());
+		Date sql = Date.valueOf(c.getData().toString());
+		s.setDate(4, sql);
 		String lat = String.valueOf(c.getLat());
 		lat = lat.replace(",", ".");
 		String longe = String.valueOf(c.getLongi());
 		longe = longe.replace(",", ".");
 		String ponto = "POINT(" + lat + " " + longe + ")";
-		s.setString(4, ponto);
+		s.setString(5, ponto);
 		s.execute();
 		s.close();
 
@@ -139,10 +143,10 @@ public class DatabaseControl {
 		try {
 			DatabaseControl c = new DatabaseControl(null, null, null, null,
 					null);
-			Timestamp t = new Timestamp(0);
-			Crime crime = new Crime(1, "assalto", "no buxo", t, 5, 5);
-			Delegacia delegacia = new Delegacia(1,"unidade da paz","neguim",30,"lol",0,1);
-			c.insertDelegacia(delegacia);
+			Date t = new Date(0);
+			Crime crime = new Crime(1, "assalto", "no buxo","12:30",t, 5, 5);
+			//Delegacia delegacia = new Delegacia(1,"unidade da paz","neguim",30,"lol",0,1);
+			c.insertCrime(crime);
 			// c.insertCrime(crime);
 			//crime = c.selectCrime(1);
 			c.close();
