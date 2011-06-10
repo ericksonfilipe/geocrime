@@ -348,10 +348,11 @@ public class DatabaseControl {
 	public void insertDelegacia(Delegacia d) throws SQLException {
 		PreparedStatement s = con
 				.prepareStatement(DatabaseControl.INSERT_DELEGACIA);
-		
+		System.out.println("AQUI");
 		s.setString(1, d.getUnidade());
 		s.setString(2, d.getDelegado());
 		s.setInt(3, d.getContingente());
+		System.out.println("AQUI");
 		s.setString(4, d.getInfoadicionais());
 		String lat = String.valueOf(d.getLat());
 		lat = lat.replace(",", ".");
@@ -361,6 +362,7 @@ public class DatabaseControl {
 		s.setString(5, ponto);
 		s.execute();
 		s.close();
+		System.out.println("AQUI");
 	}
 	
 	public void insertViatura(Viatura v) throws SQLException {
@@ -389,15 +391,13 @@ public class DatabaseControl {
 			DatabaseControl c = new DatabaseControl(null, null, null, null,
 					null);
 			Date t = new Date(0);
-			Crime crime = new Crime(1, "assalto", "no buxo","12:30",t, 5, 5);
-			//Delegacia delegacia = new Delegacia(1,"unidade da paz","neguim",30,"lol",0,1);
-			c.insertCrime(crime);
-			Crime crime2 = c.selectCrime(1);
-			System.out.println(crime2.tipo);
-			List<Crime> x = c.selectCrimes();
-			for (Crime crime3 : x) {
-				System.out.println(crime3.id);
-			}
+		//	Crime crime = new Crime(1, "assalto", "no buxo","12:30",t, 5, 5);
+			Delegacia delegacia = new Delegacia(1,"unidade da paz","neguim",30,"lol",0,1);
+			c.insertDelegacia(delegacia);
+	//		c.insertCrime(crime);
+		//	Crime crime2 = c.selectCrime(1);
+	//		System.out.println(crime2.tipo);
+	//		List<Crime> x = c.selectCrimes();
 			// c.insertCrime(crime);
 			//crime = c.selectCrime(1);
 			c.close();

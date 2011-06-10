@@ -7,11 +7,11 @@ import com.google.gwt.user.client.ui.HTML;
 
 public class MarkerDelegacia  extends Marker{
 
-	private String unidade;
-	private String delegado;
-	private Integer contingente;
-	private Integer numViaturas;
-	private String infoAdd;
+	String unidade;
+	String delegado;
+	Integer contingente;
+	Integer numViaturas;
+	String infoAdd;
 	
 	
 	public MarkerDelegacia(LatLng point, MarkerOptions options) {
