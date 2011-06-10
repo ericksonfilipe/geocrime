@@ -1,7 +1,17 @@
-package com.ufcg.sig.geocrime.server.util;
+package com.ufcg.sig.geocrime.shared;
 
-public class Viatura {
-	  public Viatura(int id, int delegacia, String id_radio, String infoadicionais,
+import java.io.Serializable;
+
+public class Viatura implements Serializable{
+	  /**
+	 * 
+	 */
+	private static final long serialVersionUID = 7072978728756198435L;
+
+	public Viatura() {
+	}
+
+	public Viatura(int id, int delegacia, String id_radio, String infoadicionais,
 			double lat, double longi) {
 		this.id = id;
 		this.delegacia = delegacia;

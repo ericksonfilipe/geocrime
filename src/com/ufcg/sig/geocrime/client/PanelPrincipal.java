@@ -1,16 +1,21 @@
 package com.ufcg.sig.geocrime.client;
 
-import java.sql.SQLException;
+import java.util.Date;
+import java.util.List;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyPressEvent;
 import com.google.gwt.event.dom.client.KeyPressHandler;
+import com.google.gwt.maps.client.InfoWindowContent;
 import com.google.gwt.maps.client.MapUIOptions;
 import com.google.gwt.maps.client.MapWidget;
 import com.google.gwt.maps.client.event.MapClickHandler;
+import com.google.gwt.maps.client.event.MarkerClickHandler;
+import com.google.gwt.maps.client.event.MarkerClickHandler.MarkerClickEvent;
 import com.google.gwt.maps.client.geocode.DirectionQueryOptions;
 import com.google.gwt.maps.client.geocode.DirectionResults;
 import com.google.gwt.maps.client.geocode.Directions;
@@ -21,6 +26,7 @@ import com.google.gwt.maps.client.geocode.LocationCallback;
 import com.google.gwt.maps.client.geocode.Placemark;
 import com.google.gwt.maps.client.geocode.Waypoint;
 import com.google.gwt.maps.client.geom.LatLng;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.Composite;
@@ -36,9 +42,11 @@ import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.ToggleButton;
 import com.google.gwt.user.client.ui.VerticalPanel;
-import com.ufcg.sig.geocrime.server.persistence.DatabaseControl;
+import com.ufcg.sig.geocrime.shared.Crime;
 
 public class PanelPrincipal extends Composite {
+	
+	private GeoCrimeServiceAsync servidor = GWT.create(GeoCrimeService.class);
 
 	private MapWidget mapa;
 	private VerticalPanel panelPrincipal;
@@ -46,9 +54,15 @@ public class PanelPrincipal extends Composite {
 	private String enderecoCrime;
 	private MapClickHandler clicaMapa;
 	private ToggleButton bCadastrar;
+	
+	private ToggleButton bRotas;
+	protected DirectionResults rota;
+	
 	public PanelPrincipal() {
 		
 		criarEConfigurarMapa();
+		
+//		carregarCrimes();
 		
 		panelPrincipal = new VerticalPanel();
 		panelPrincipal.setSpacing(10);
@@ -103,7 +117,6 @@ public class PanelPrincipal extends Composite {
 		
 	}
 
-
 	private void criarEConfigurarMapa() {
 		mapa = new MapWidget(LatLng.newInstance(-7.231188, -35.886669), 13);
 		mapa.setSize("850px", "600px");
@@ -116,6 +129,31 @@ public class PanelPrincipal extends Composite {
 		mapa.setUI(options);
 		mapa.setDoubleClickZoom(true);
 		mapa.setDraggable(true);
+servidor.getCrimes(new AsyncCallback<List<Crime>>() {
+			
+			@Override
+			public void onSuccess(List<Crime> result) {
+				System.out.println("->"+result.size());
+				for(Crime crime : result) {
+					final MarkerLocalCrime marcador = new MarkerLocalCrime(LatLng.newInstance(crime.getLat(), crime.getLongi()));
+					marcador.setDados("", crime.getTipo(), crime.getDescricao(), crime.getHorario(), new Date(crime.getData()));
+					mapa.addOverlay(marcador);
+					
+					marcador.addMarkerClickHandler(new MarkerClickHandler() {
+
+						@Override
+						public void onClick(MarkerClickEvent event) {
+							mapa.getInfoWindow().open(marcador,
+									new InfoWindowContent(marcador.getHTML()));
+						}
+					});
+				}
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+			}
+		});
 	}
 
 
@@ -461,33 +499,98 @@ public class PanelPrincipal extends Composite {
 			}
 		});
 
+		consulta1bt = new Button("Consulta 1");
+		consulta1bt.setWidth("152px");
+		consulta1bt.setHeight("42px");
 		vPanel.add(consulta1bt);
-		
+
 		Button consulta2bt = new Button("Consulta 2");
-		consulta2bt.setWidth("142px");
+		consulta2bt.setWidth("152px");
 		consulta2bt.setHeight("42px");
 		vPanel.add(consulta2bt);
-		
+
 		Button consulta3bt = new Button("Consulta 3");
-		consulta3bt.setWidth("142px");
+		consulta3bt.setWidth("152px");
 		consulta3bt.setHeight("42px");
 		vPanel.add(consulta3bt);
-		
+
 		Button consulta4bt = new Button("Consulta 4");
-		consulta4bt.setWidth("142px");
+		consulta4bt.setWidth("152px");
 		consulta4bt.setHeight("42px");
 		vPanel.add(consulta4bt);
-		
-		Button consulta5bt = new Button("Consulta 5");
-		consulta5bt.setWidth("142px");
-		consulta5bt.setHeight("42px");
-		vPanel.add(consulta5bt);
-		
+
+		bRotas = new ToggleButton("Rota de delegacia para crime",
+				"Rota de delegacia para crime");
+		bRotas.setWidth("152px");
+		bRotas.setHeight("42px");
+		bRotas.addClickHandler(new ClickHandler() {
+
+			private MapClickHandler listenerRotas;
+
+			@Override
+			public void onClick(ClickEvent event) {
+				if (rota != null) {
+					mapa.removeOverlay(rota.getPolyline());
+					mapa.removeOverlay(rota.getMarkers().get(0));
+					mapa.removeOverlay(rota.getMarkers().get(1));
+				}
+				if (bRotas.isDown()) {
+					listenerRotas = new MapClickHandler() {
+
+						private Waypoint[] pontosDaRota = new Waypoint[2];
+						private int contador = 0;
+
+						@Override
+						public void onClick(MapClickEvent event) {
+							
+							pontosDaRota[contador] = new Waypoint(event
+									.getLatLng());
+							if (contador == 1) {
+								rota = carregarRota(pontosDaRota, listenerRotas);
+							}
+							contador++;
+						}
+					};
+					mapa.addMapClickHandler(listenerRotas);
+				} else {
+					lbMesagens.setText("");
+
+					mapa.setDoubleClickZoom(true);
+					mapa.removeMapClickHandler(listenerRotas);
+				}
+			}
+		});
+		vPanel.add(bRotas);
 
 		return vPanel;
 	}
 
-	
+
+	private DirectionResults carregarRota(Waypoint[] pontosDaRota, MapClickHandler listenerRotas) {
+		DirectionQueryOptions dqo = new DirectionQueryOptions(
+				mapa);
+		dqo.setRetrievePolyline(true);
+		Directions.loadFromWaypoints(pontosDaRota, dqo,
+				new DirectionsCallback() {
+
+					@Override
+					public void onSuccess(
+							DirectionResults result) {
+						rota = result;
+						mapa.addOverlay(rota.getPolyline());
+						bRotas.setDown(false);
+						System.out
+								.println(bRotas.isDown());
+					}
+
+					@Override
+					public void onFailure(int statusCode) {
+					}
+				});
+		mapa.removeMapClickHandler(listenerRotas);
+		return rota;
+	}
+
 	public void consultarRua(String rua) {
 		Geocoder geo = new Geocoder();
 		

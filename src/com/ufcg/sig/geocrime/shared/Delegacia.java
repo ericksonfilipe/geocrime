@@ -1,7 +1,16 @@
-package com.ufcg.sig.geocrime.server.util;
+package com.ufcg.sig.geocrime.shared;
 
-public class Delegacia {
-	  public Delegacia(int id, String unidade, String delegado, int contingente,
+import java.io.Serializable;
+
+public class Delegacia implements Serializable {
+	  /**
+	 * 
+	 */
+	private static final long serialVersionUID = -4937566789116481702L;
+
+	public Delegacia() {}
+	
+	public Delegacia(int id, String unidade, String delegado, int contingente,
 			String infoadicionais, double lat, double longi) {
 		this.id = id;
 		this.unidade = unidade;

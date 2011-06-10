@@ -1,12 +1,18 @@
-package com.ufcg.sig.geocrime.server.util;
+package com.ufcg.sig.geocrime.shared;
 
-import java.sql.Timestamp;
-import java.util.Date;
+import java.io.Serializable;
 
-public class Crime {
+public class Crime implements Serializable{
 
-	
-	public Crime(int id, String tipo, String descricao, String horario,Date data,
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -2363447308297415872L;
+
+	public Crime() {
+	}
+
+	public Crime(int id, String tipo, String descricao, String horario,long data,
 			double lat, double longi) {
 		this.id = id;
 		this.tipo = tipo;
@@ -19,7 +25,7 @@ public class Crime {
 	public int id;
 	public String tipo;
 	public String descricao;
-	public Date data;
+	public long data;
 	public String horario;
 	public double lat;
 	public double longi;
@@ -60,10 +66,10 @@ public class Crime {
 	public void setLongi(double longi) {
 		this.longi = longi;
 	}
-	public Date getData() {
+	public long getData() {
 		return data;
 	}
-	public void setData(Date data) {
+	public void setData(long data) {
 		this.data = data;
 	}
 }

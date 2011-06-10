@@ -3,7 +3,7 @@ package com.ufcg.sig.geocrime.server.persistence;
 import java.sql.SQLException;
 import java.util.Date;
 
-import com.ufcg.sig.geocrime.server.util.Crime;
+import com.ufcg.sig.geocrime.shared.Crime;
 import com.ufcg.sig.geocrime.server.util.Delegacia;
 import com.ufcg.sig.geocrime.server.util.Viatura;
 
@@ -33,7 +33,7 @@ public class PersistenceFacade {
 	// TODO
 	public void saveCrime(String tipo, String descricao, String horario,
 			Date data, double lat, double longi) {
-		Crime c = new Crime(0,tipo,descricao,horario,data,lat,longi);
+		Crime c = new Crime(0,tipo,descricao,horario,data.getTime(),lat,longi);
 		try {
 			db.insertCrime(c);
 		} catch (SQLException e) {

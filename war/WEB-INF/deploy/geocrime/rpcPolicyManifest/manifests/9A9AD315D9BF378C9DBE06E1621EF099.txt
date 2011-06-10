@@ -1,0 +1,2 @@
+serviceClass: com.ufcg.sig.geocrime.client.GeoCrimeService
+path: B87AA6CE98B0A5C09AC5FA4EC74EF141.gwt.rpc
