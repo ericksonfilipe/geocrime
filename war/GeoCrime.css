@@ -1,0 +1,102 @@
+/** Add css rules here for your application. */
+
+
+/** Example rules used by the template application (remove for your app) */
+h1 {
+  font-weight: bold;
+  color: #777777;
+  margin: 20px 0px 30px;
+  text-align: center;
+}
+
+.sendButton {
+  display: block;
+  font-size: 16pt;
+}
+
+/** Most GWT widgets already have a style name defined */
+.gwt-DialogBox {
+  width: 400px;
+}
+
+.dialogVPanel {
+  margin: 5px;
+}
+
+.serverResponseLabelError {
+  color: red;
+}
+
+/** Set ids using widget.getElement().setId("idOfElement") */
+#closeButton {
+  margin: 15px 6px 6px;
+}
+
+.corpo {
+	width: 800px;
+}
+
+.links {
+	float: right;
+}
+
+.centralizar {
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.inputText {
+	border: 3px double #CCCCCC;
+	width: 230px;	
+}
+
+.localCrime {
+	border: 1px solid black; 
+	margin-bottom: 20px;
+}
+
+.botoesCadastrar {
+	margin-top: 30px;
+}
+
+.avisos {
+	margin: 30px;
+	color: red;	
+}
+
+.tituloCadastro {
+	font-size: 17px;
+	font-weight: bold;
+	margin-bottom: 20px;
+}
+
+.cadastrado {
+	font-size: 17px;
+	font-weight: bold;
+	margin-top: 10px;
+	margin-bottom: 20px;
+}
+
+.tituloCadastro {
+	font-weight: bold;
+	font-size: 17px;
+	margin-bottom: 5px;
+}
+
+.erroCadastro {
+	color: red;	
+}
+
+.campoErro {
+	color: red;	
+}
+
+.panelHorario {
+	border: 1px solid black; 
+	margin-bottom: 20px;
+}
+
+.mapaErro {
+	border: 1px solid red; 
+	margin-bottom: 20px;
+}
