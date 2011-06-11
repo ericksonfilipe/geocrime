@@ -7,7 +7,6 @@ import com.google.gwt.maps.client.MapUIOptions;
 import com.google.gwt.maps.client.MapWidget;
 import com.google.gwt.maps.client.event.MapClickHandler;
 import com.google.gwt.maps.client.geom.LatLng;
-import com.google.gwt.maps.client.overlay.Marker;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
@@ -345,8 +344,8 @@ public class PanelCadastraDelegacia extends Composite{
             }
 
     };
-    	//vPrincipal.add(bOk);
-		//greetingService.saveDelegacia(markPosicao.unidade,markPosicao.delegado,markPosicao.contingente,markPosicao.infoAdd,lat,longi,teste);
+    	vPrincipal.add(bOk);
+		greetingService.saveDelegacia(markPosicao.unidade,markPosicao.delegado,markPosicao.contingente,markPosicao.infoAdd,lat,longi,teste);
 		
 	}
 	

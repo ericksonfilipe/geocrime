@@ -15,7 +15,6 @@ import com.google.gwt.maps.client.MapUIOptions;
 import com.google.gwt.maps.client.MapWidget;
 import com.google.gwt.maps.client.event.MapClickHandler;
 import com.google.gwt.maps.client.event.MarkerClickHandler;
-import com.google.gwt.maps.client.event.MarkerClickHandler.MarkerClickEvent;
 import com.google.gwt.maps.client.geocode.DirectionQueryOptions;
 import com.google.gwt.maps.client.geocode.DirectionResults;
 import com.google.gwt.maps.client.geocode.Directions;
@@ -43,6 +42,8 @@ import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.ToggleButton;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.ufcg.sig.geocrime.shared.Crime;
+import com.ufcg.sig.geocrime.shared.Delegacia;
+import com.ufcg.sig.geocrime.shared.Viatura;
 
 public class PanelPrincipal extends Composite {
 	
@@ -54,6 +55,9 @@ public class PanelPrincipal extends Composite {
 	private String enderecoCrime;
 	private MapClickHandler clicaMapa;
 	private ToggleButton bCadastrar;
+	final CheckBox mostrarCrimes;
+	final CheckBox mostrarDelegacia;
+	final CheckBox mostrarViaturas;
 	
 	private ToggleButton bRotas;
 	protected DirectionResults rota;
@@ -61,7 +65,6 @@ public class PanelPrincipal extends Composite {
 	public PanelPrincipal() {
 		
 		criarEConfigurarMapa();
-		
 //		carregarCrimes();
 		
 		panelPrincipal = new VerticalPanel();
@@ -80,20 +83,109 @@ public class PanelPrincipal extends Composite {
 		hPanelOpcoes.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);;
 		
 		Label mostrarLb = new Label("Mostrar: ");
-		CheckBox mostrarBairro = new CheckBox("Bairros");
-		mostrarBairro.setValue(true);
-		
-		CheckBox mostrarCrimes = new CheckBox("Crimes");
+		mostrarCrimes = new CheckBox("Crimes");
 		mostrarCrimes.setValue(true);
 		
-		CheckBox mostrarDelegacia = new CheckBox("Delegacias");
+		mostrarDelegacia = new CheckBox("Delegacias");
 		mostrarDelegacia.setValue(true);
 		
-		CheckBox mostrarViaturas = new CheckBox("Viaturas");
+		mostrarViaturas = new CheckBox("Viaturas");
 		mostrarViaturas.setValue(true);
+				
+		ClickHandler handler = new ClickHandler() {
+			
+			@Override
+			public void onClick(ClickEvent event) {
+				mapa.clearOverlays();
+				if (mostrarCrimes.isChecked()) {
+						servidor.getCrimes(new AsyncCallback<List<Crime>>() {
+							
+							@Override
+							public void onSuccess(List<Crime> result) {
+								for(Crime crime : result) {
+									final MarkerLocalCrime marcador = new MarkerLocalCrime(LatLng.newInstance(crime.getLat(), crime.getLongi()));
+									marcador.setDados("", crime.getTipo(), crime.getDescricao(), crime.getHorario(), new Date(crime.getData()));
+									mapa.addOverlay(marcador);
+									
+									marcador.addMarkerClickHandler(new MarkerClickHandler() {
+		
+										@Override
+										public void onClick(MarkerClickEvent event) {
+											mapa.getInfoWindow().open(marcador,
+													new InfoWindowContent(marcador.getHTML()));
+										}
+									});
+						}
+							}
+						
+						@Override
+						public void onFailure(Throwable caught) {
+						}
+					});
+				}
+				if (mostrarDelegacia.isChecked()) {
+					servidor.getDelegacias(new AsyncCallback<List<Delegacia>>() {
+						
+						@Override
+						public void onSuccess(List<Delegacia> result) {
+							for(Delegacia delegacia : result) {
+								final MarkerDelegacia marcador = new MarkerDelegacia(LatLng.newInstance(delegacia.getLat(), delegacia.getlongi()));
+								marcador.setDados(delegacia.getUnidade(), delegacia.getDelegado(), delegacia.getContingente(), 0, delegacia.getInfoadicionais());
+								mapa.addOverlay(marcador);
+								
+								marcador.addMarkerClickHandler(new MarkerClickHandler() {
+
+									@Override
+									public void onClick(MarkerClickEvent event) {
+										mapa.getInfoWindow().open(marcador,
+												new InfoWindowContent(marcador.getHTML()));
+									}
+								});
+							}
+						}
+						
+						@Override
+						public void onFailure(Throwable caught) {
+						}
+					});
+				}
+				
+				if (mostrarViaturas.isChecked()) {
+					servidor.getViaturas(new AsyncCallback<List<Viatura>>() {
+						
+						@Override
+						public void onSuccess(List<Viatura> result) {
+							for(Viatura viatura : result) {
+								
+								final MarkerViatura marcador = new MarkerViatura(LatLng.newInstance(viatura.getLat(), viatura.getlongi()));
+								marcador.setDados(viatura.getId() + "", viatura.getId_radio(), viatura.getInfoadicionais());
+								mapa.addOverlay(marcador);
+								
+								marcador.addMarkerClickHandler(new MarkerClickHandler() {
+
+									@Override
+									public void onClick(MarkerClickEvent event) {
+										mapa.getInfoWindow().open(marcador, new InfoWindowContent(marcador.getHTML()));
+									}
+								});
+							}
+						}
+						
+						@Override
+						public void onFailure(Throwable caught) {
+						}
+					});
+				}
+				
+				
+			}
+		};
+		
+		mostrarDelegacia.addClickHandler(handler);
+		mostrarViaturas.addClickHandler(handler);
+		mostrarCrimes.addClickHandler(handler);
 		
 		hPanelOpcoes.add(mostrarLb);
-		hPanelOpcoes.add(mostrarBairro);
 		hPanelOpcoes.add(mostrarCrimes);
 		hPanelOpcoes.add(mostrarDelegacia);
 		hPanelOpcoes.add(mostrarViaturas);
@@ -129,11 +221,11 @@ public class PanelPrincipal extends Composite {
 		mapa.setUI(options);
 		mapa.setDoubleClickZoom(true);
 		mapa.setDraggable(true);
-servidor.getCrimes(new AsyncCallback<List<Crime>>() {
+		
+		servidor.getCrimes(new AsyncCallback<List<Crime>>() {
 			
 			@Override
 			public void onSuccess(List<Crime> result) {
-				System.out.println("->"+result.size());
 				for(Crime crime : result) {
 					final MarkerLocalCrime marcador = new MarkerLocalCrime(LatLng.newInstance(crime.getLat(), crime.getLongi()));
 					marcador.setDados("", crime.getTipo(), crime.getDescricao(), crime.getHorario(), new Date(crime.getData()));
@@ -145,6 +237,56 @@ servidor.getCrimes(new AsyncCallback<List<Crime>>() {
 						public void onClick(MarkerClickEvent event) {
 							mapa.getInfoWindow().open(marcador,
 									new InfoWindowContent(marcador.getHTML()));
+						}
+					});
+				}
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+			}
+		});
+		
+		servidor.getDelegacias(new AsyncCallback<List<Delegacia>>() {
+			
+			@Override
+			public void onSuccess(List<Delegacia> result) {
+				for(Delegacia delegacia : result) {
+					final MarkerDelegacia marcador = new MarkerDelegacia(LatLng.newInstance(delegacia.getLat(), delegacia.getlongi()));
+					marcador.setDados(delegacia.getUnidade(), delegacia.getDelegado(), delegacia.getContingente(), 0, delegacia.getInfoadicionais());
+					mapa.addOverlay(marcador);
+					
+					marcador.addMarkerClickHandler(new MarkerClickHandler() {
+
+						@Override
+						public void onClick(MarkerClickEvent event) {
+							mapa.getInfoWindow().open(marcador,
+									new InfoWindowContent(marcador.getHTML()));
+						}
+					});
+				}
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+			}
+		});
+		
+		servidor.getViaturas(new AsyncCallback<List<Viatura>>() {
+			
+			@Override
+			public void onSuccess(List<Viatura> result) {
+				for(Viatura viatura : result) {
+					
+					final MarkerViatura marcador = new MarkerViatura(LatLng.newInstance(viatura.getLat(), viatura.getlongi()));
+					marcador.setDados(viatura.getId() + "", viatura.getId_radio(), viatura.getInfoadicionais());
+					mapa.addOverlay(marcador);
+					
+					marcador.addMarkerClickHandler(new MarkerClickHandler() {
+
+						@Override
+						public void onClick(MarkerClickEvent event) {
+							mapa.getInfoWindow().open(marcador, new InfoWindowContent(marcador.getHTML()));
 						}
 					});
 				}
@@ -331,14 +473,14 @@ servidor.getCrimes(new AsyncCallback<List<Crime>>() {
 			
 			@Override
 			public void onClick(ClickEvent event) {
-//				if (login.getText().equals("") || senha.getText().equals("")) {            // <------------ descomentar para ativar senha
-//					dialogBox.setText("Ha campos vazios!!!!!");
-//				}
-//				else if (login.getText().equals("eu") && senha.getText().equals("123")){  // <------------- modificar para o BD
+				if (login.getText().equals("") || senha.getText().equals("")) {            // <------------ descomentar para ativar senha
+					dialogBox.setText("Ha campos vazios!!!!!");
+				}
+				else if (login.getText().equals("admin") && senha.getText().equals("sig")){  // <------------- modificar para o BD
 					dialogBox.hide();
 					RootPanel.get().add(new PanelAreaRestrita(panelPrincipal));
 					setVisible(false);
-//				}
+				}
 			}
 		});
 		
@@ -455,69 +597,84 @@ servidor.getCrimes(new AsyncCallback<List<Crime>>() {
 		
 		
 		vPanel.add(bCadastrar);
-		
-		Button consulta1bt = new Button("Consulta 1");
-		consulta1bt.setWidth("142px");
-		consulta1bt.setHeight("42px");
-		consulta1bt.addClickHandler(new ClickHandler() {
+
+		Button consulta2bt = new Button("Crimes de Fevereiro de 2011");
+		consulta2bt.setWidth("152px");
+		consulta2bt.setHeight("42px");
+		consulta2bt.addClickHandler(new ClickHandler() {
 			
 			@Override
 			public void onClick(ClickEvent event) {
-				mapa.addMapClickHandler(new MapClickHandler() {
-					
-					private Waypoint[] pontosDaRota = new Waypoint[2];
-					private int contador = 0;
+				mapa.clearOverlays();
+				mostrarCrimes.setValue(false);
+				mostrarDelegacia.setValue(false);
+				mostrarViaturas.setValue(false);
+				servidor.consulta2(new AsyncCallback<List<Crime>>() {
 
 					@Override
-					public void onClick(MapClickEvent event) {
-						pontosDaRota[contador ] = new Waypoint(event.getLatLng());
-						if (contador == 1) {
-							DirectionQueryOptions dqo = new DirectionQueryOptions(mapa);
-							dqo.setRetrievePolyline(true);
-							Directions.loadFromWaypoints(pontosDaRota, dqo, new DirectionsCallback() {
-								
+					public void onFailure(Throwable caught) {
+					}
+
+					@Override
+					public void onSuccess(List<Crime> result) {
+						for(Crime crime : result) {
+							final MarkerLocalCrime marcador = new MarkerLocalCrime(LatLng.newInstance(crime.getLat(), crime.getLongi()));
+							marcador.setDados("", crime.getTipo(), crime.getDescricao(), crime.getHorario(), new Date(crime.getData()));
+							mapa.addOverlay(marcador);
+
+							marcador.addMarkerClickHandler(new MarkerClickHandler() {
+
 								@Override
-								public void onSuccess(DirectionResults result) {
-									mapa.addOverlay(result.getPolyline());
-									
-								}
-								
-								@Override
-								public void onFailure(int statusCode) {
-									// TODO Auto-generated method stub
-									
+								public void onClick(MarkerClickEvent event) {
+									mapa.getInfoWindow().open(marcador,
+											new InfoWindowContent(marcador.getHTML()));
 								}
 							});
-							pontosDaRota = new Waypoint[2];
-							contador = 0;
 						}
-						contador++;
-						
 					}
 				});
 				
 			}
 		});
-
-		consulta1bt = new Button("Consulta 1");
-		consulta1bt.setWidth("152px");
-		consulta1bt.setHeight("42px");
-		vPanel.add(consulta1bt);
-
-		Button consulta2bt = new Button("Consulta 2");
-		consulta2bt.setWidth("152px");
-		consulta2bt.setHeight("42px");
 		vPanel.add(consulta2bt);
-
-		Button consulta3bt = new Button("Consulta 3");
+		Button consulta3bt = new Button("Delegacia com mais criminalidade(raio 1km)");
 		consulta3bt.setWidth("152px");
 		consulta3bt.setHeight("42px");
-		vPanel.add(consulta3bt);
+		consulta3bt.addClickHandler(new ClickHandler() {
+			
+			@Override
+			public void onClick(ClickEvent event) {
+				mapa.clearOverlays();
+				mostrarCrimes.setValue(false);
+				mostrarDelegacia.setValue(false);
+				mostrarViaturas.setValue(false);
+				servidor.consulta6(new AsyncCallback<List<Delegacia>>() {
+					
+					@Override
+					public void onSuccess(List<Delegacia> result) {
+						if (!result.isEmpty()) {
+							Delegacia delegacia = result.get(0);
+							final MarkerDelegacia marcador = new MarkerDelegacia(LatLng.newInstance(result.get(0).getLat(), result.get(0).getlongi()));
+							marcador.setDados(delegacia.getUnidade(), delegacia.getDelegado(), delegacia.getContingente(), 0, delegacia.getInfoadicionais());
+							mapa.addOverlay(marcador);
+							
+							marcador.addMarkerClickHandler(new MarkerClickHandler() {
 
-		Button consulta4bt = new Button("Consulta 4");
-		consulta4bt.setWidth("152px");
-		consulta4bt.setHeight("42px");
-		vPanel.add(consulta4bt);
+								@Override
+								public void onClick(MarkerClickEvent event) {
+									mapa.getInfoWindow().open(marcador,
+											new InfoWindowContent(marcador.getHTML()));
+								}
+							});
+						}
+					}
+					
+					@Override
+					public void onFailure(Throwable caught) {}
+				});
+			}
+		});
+		vPanel.add(consulta3bt);
 
 		bRotas = new ToggleButton("Rota de delegacia para crime",
 				"Rota de delegacia para crime");
@@ -579,8 +736,6 @@ servidor.getCrimes(new AsyncCallback<List<Crime>>() {
 						rota = result;
 						mapa.addOverlay(rota.getPolyline());
 						bRotas.setDown(false);
-						System.out
-								.println(bRotas.isDown());
 					}
 
 					@Override

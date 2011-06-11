@@ -26,7 +26,7 @@ public class MarkerViatura extends Marker{
 	}
 	
 	public HTML getHTML() {
-		HTML result = new HTML("<b>Identificador:</b> "+identificador);
+		HTML result = new HTML("<b>VIATURA</b><br /><b>Identificador:</b> "+identificador);
 		
 		return result;
 	}

@@ -38,7 +38,7 @@ public class MarkerLocalCrime extends Marker{
 	
 	
 	public HTML getHTML() {
-		HTML result = new HTML("<b>Local:</b> "+local+"<br /> <b>Tipo:</b> "+tipo+"<br /> <b>Descricao:</b> "+descricao+"<br /> <b>Horario:</b> "+horario+"<br /> <b>Data</b>: "+data.toString());
+		HTML result = new HTML("<b>CRIME</b><br /><b>Tipo:</b> "+tipo+"<br /> <b>Descricao:</b> "+descricao+"<br /> <b>Horario:</b> "+horario+"<br /> <b>Data</b>: "+data.toString());
 		
 		return result;
 	}

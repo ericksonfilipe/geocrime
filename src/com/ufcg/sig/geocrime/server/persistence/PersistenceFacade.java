@@ -4,8 +4,8 @@ import java.sql.SQLException;
 import java.util.Date;
 
 import com.ufcg.sig.geocrime.shared.Crime;
-import com.ufcg.sig.geocrime.server.util.Delegacia;
-import com.ufcg.sig.geocrime.server.util.Viatura;
+import com.ufcg.sig.geocrime.shared.Delegacia;
+import com.ufcg.sig.geocrime.shared.Viatura;
 
 public class PersistenceFacade {
 	DatabaseControl db;
