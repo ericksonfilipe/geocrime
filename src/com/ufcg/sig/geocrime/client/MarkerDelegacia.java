@@ -32,7 +32,7 @@ public class MarkerDelegacia  extends Marker{
 	}
 	
 	public HTML getHTML() {
-		HTML result = new HTML("<b>TODO</b>");
+		HTML result = new HTML("<b>DELEGACIA</b><br />Unidade: "+unidade+" Delegado: "+delegado+" Contingente: "+contingente+" Num. Viaturas: "+numViaturas+" Info. Adicionais: "+infoAdd);
 		
 		return result;
 	}

@@ -248,7 +248,8 @@ public class DatabaseControl {
 		while (rs.next()) {
 			Integer id = (Integer) rs.getObject("id");
 			Integer delegacia = (Integer) rs.getObject("delegacia");
-			String id_radio = (String) rs.getObject("id_radio");
+			Integer temp = (Integer) rs.getObject("id_radio");
+			String id_radio =  temp + "";
 			String infoAdicionais = (String) rs.getObject("infoAdicionais");
 			PGgeometry the_geom = (PGgeometry) rs.getObject("the_geom");
 			String point = the_geom.getGeometry().getValue();
@@ -409,10 +410,14 @@ public class DatabaseControl {
 			Delegacia delegacia = new Delegacia(1,"unidade da paz","neguim",30,"lol",0,1);
 			c.insertDelegacia(delegacia);
 	//		c.insertCrime(crime);
-		//	Crime crime2 = c.selectCrime(1);
-	//		System.out.println(crime2.tipo);
-	//		List<Crime> x = c.selectCrimes();
-			// c.insertCrime(crime);
+			List<Delegacia> crime2 = c.consultaSeis();
+			System.out.println("Aki em baixo:");
+			for (Delegacia crime3 : crime2) {
+				System.out.println(crime3.getId() + " " + crime3.getUnidade());
+				
+			}
+//			List<Crime> x = c.selectCrimes();
+//			 c.insertCrime(crime);
 			//crime = c.selectCrime(1);
 			c.close();
 		} catch (SQLException e) {

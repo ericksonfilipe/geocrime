@@ -7,7 +7,6 @@ import com.google.gwt.maps.client.MapUIOptions;
 import com.google.gwt.maps.client.MapWidget;
 import com.google.gwt.maps.client.event.MapClickHandler;
 import com.google.gwt.maps.client.geom.LatLng;
-import com.google.gwt.maps.client.overlay.Marker;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
@@ -92,11 +91,7 @@ public class PanelCadastraViatura extends Composite {
 			public void onClick(MapClickEvent event) {
 				
 				if (markPosicao == null) {
-					
-					
-// Personalizar Icone    <--------------
-//					
-//					Icon icon = Icon.newInstance("imgs/xx.ico");
+//					Icon icon = Icon.newInstance("imgs/viatura.jpg");
 //					icon.setIconSize(Size.newInstance(15, 23));
 //
 //					MarkerOptions opcoes = MarkerOptions.newInstance();
